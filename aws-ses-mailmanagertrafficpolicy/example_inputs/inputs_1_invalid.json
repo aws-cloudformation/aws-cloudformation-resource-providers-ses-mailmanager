@@ -1,0 +1,6 @@
+{
+    "FilterSetName": "Filter",
+    "DefaultAction": "DO_NOT_EXIST",
+    "FilterStatements": [],
+    "MaxMessageSizeBytes": 1000.0
+}
