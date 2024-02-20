@@ -1,0 +1,90 @@
+{
+    "FilterSetName": "Filter",
+    "DefaultAction": "DENY",
+    "FilterStatements": [
+        {
+            "Conditions": [
+                {
+                    "StringExpression": {
+                        "Evaluate": {
+                            "Attribute": "RECIPIENT"
+                        },
+                        "Operator": "ENDS_WITH",
+                        "Value": [
+                            "@amazon.com"
+                        ]
+                    },
+                    "IpExpression": null,
+                    "TlsExpression": null
+                },
+                {
+                    "StringExpression": {
+                        "Evaluate": {
+                            "Attribute": "RECIPIENT"
+                        },
+                        "Operator": "CONTAINS",
+                        "Value": [
+                            "zlinzhou"
+                        ]
+                    },
+                    "IpExpression": null,
+                    "TlsExpression": null
+                }
+            ],
+            "Action": "ALLOW"
+        },
+        {
+            "Conditions": [
+                {
+                    "StringExpression": null,
+                    "IpExpression": null,
+                    "TlsExpression": {
+                        "Evaluate": {
+                            "Attribute": "TLS_PROTOCOL"
+                        },
+                        "Operator": "MINIMUM_TLS_VERSION",
+                        "Value": "TLS1_3"
+                    }
+                }
+            ],
+            "Action": "ALLOW"
+        },
+        {
+            "Conditions": [
+                {
+                    "StringExpression": {
+                        "Evaluate": {
+                            "Attribute": "RECIPIENT"
+                        },
+                        "Operator": "CONTAINS",
+                        "Value": [
+                            "@trashmaker.com"
+                        ]
+                    },
+                    "IpExpression": null,
+                    "TlsExpression": null
+                }
+            ],
+            "Action": "DENY"
+        },
+        {
+            "Conditions": [
+                {
+                    "StringExpression": null,
+                    "IpExpression": {
+                        "Evaluate": {
+                            "Attribute": "SENDER_IP"
+                        },
+                        "Operator": "CIDR_NOT_IN",
+                        "Value": [
+                            "127.0.0.0/16"
+                        ]
+                    },
+                    "TlsExpression": null
+                }
+            ],
+            "Action": "DENY"
+        }
+    ],
+    "MaxMessageSizeBytes": 2000.0
+}
