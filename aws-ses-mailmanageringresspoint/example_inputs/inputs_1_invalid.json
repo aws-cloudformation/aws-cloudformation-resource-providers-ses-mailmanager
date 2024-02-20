@@ -1,0 +1,9 @@
+{
+    "IngressPointName": "ingress_point_name",
+    "Type": "DO_NOT_EXIST",
+    "TrafficPolicyId": "",
+    "RuleSetId": "",
+    "IngressPointConfiguration": {
+        "SmtpPassword": "password"
+    }
+}

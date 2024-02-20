@@ -1,0 +1,135 @@
+{
+    "typeName": "AWS::SES::MailManagerIngressPoint",
+    "description": "Definition of AWS::SES::MailManagerIngressPoint Resource Type",
+    "sourceUrl": "https://add-github-url-once-repo-team-get-created-by-cfn-team.com",
+    "definitions": {
+        "IngressPointConfiguration": {
+            "type": "object",
+            "properties": {
+                "SmtpPassword": {
+                    "type": "string",
+                    "maxLength": 64,
+                    "minLength": 8,
+                    "pattern": "^[A-Za-z0-9!@#$%^&*()_+\\-=\\[\\]{}|.,?]+$"
+                }
+            },
+            "additionalProperties": false
+        },
+        "IngressPointStatus": {
+            "type": "string",
+            "enum": [
+                "PROVISIONING",
+                "DEPROVISIONING",
+                "UPDATING",
+                "ACTIVE",
+                "CLOSED",
+                "FAILED",
+                "DELETED"
+            ]
+        },
+        "IngressPointType": {
+            "type": "string",
+            "enum": [
+                "OPEN_RELAY",
+                "AUTH_RELAY"
+            ]
+        },
+        "Unit": {
+            "type": "object",
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "ARecord": {
+            "type": "string"
+        },
+        "TrafficPolicyId": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1
+        },
+        "IngressPointConfiguration": {
+            "$ref": "#/definitions/IngressPointConfiguration"
+        },
+        "IngressPointArn": {
+            "type": "string"
+        },
+        "IngressPointId": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1
+        },
+        "IngressPointName": {
+            "type": "string",
+            "maxLength": 63,
+            "minLength": 3,
+            "pattern": "^[A-Za-z0-9_\\-]+$"
+        },
+        "RuleSetId": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1
+        },
+        "Type": {
+            "$ref": "#/definitions/IngressPointType"
+        }
+    },
+    "tagging": {
+        "taggable": false,
+        "tagOnCreate": false,
+        "tagUpdatable": false,
+        "cloudFormationSystemTags": false
+    },
+    "required": [
+        "IngressPointName",
+        "Type",
+        "TrafficPolicyId",
+        "RuleSetId"
+    ],
+    "readOnlyProperties": [
+        "/properties/IngressPointId",
+        "/properties/IngressPointArn",
+        "/properties/IngressPointStatus",
+        "/properties/ARecord"
+    ],
+    "createOnlyProperties": [
+        "/properties/Type"
+    ],
+    "writeOnlyProperties": [
+        "/properties/SmtpPassword"
+    ],
+    "primaryIdentifier": [
+        "/properties/IngressPointId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "ses:GetIngressPoint",
+                "ses:CreateIngressPoint"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "ses:GetIngressPoint"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "ses:GetIngressPoint",
+                "ses:UpdateIngressPoint"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "ses:GetIngressPoint",
+                "ses:DeleteIngressPoint"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "ses:ListIngressPoints"
+            ]
+        }
+    },
+    "additionalProperties": false
+}
