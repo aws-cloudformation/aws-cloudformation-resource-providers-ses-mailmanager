@@ -311,6 +311,7 @@
         },
         "delete": {
             "permissions": [
+                "ses:GetTrafficPolicy",
                 "ses:DeleteTrafficPolicy"
             ]
         },

@@ -1,0 +1,123 @@
+{
+    "typeName": "AWS::SES::MailManagerRelay",
+    "description": "Definition of AWS::SES::MailManagerRelay Resource Type",
+    "definitions": {
+        "RelayAuthentication": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "title": "PasswordAuthentication",
+                    "properties": {
+                        "PasswordAuthentication": {
+                            "$ref": "#/definitions/RelayPasswordAuthentication"
+                        }
+                    },
+                    "required": [
+                        "PasswordAuthentication"
+                    ],
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "RelayPasswordAuthentication": {
+            "type": "object",
+            "properties": {
+                "Username": {
+                    "type": "string",
+                    "maxLength": 1024,
+                    "minLength": 1,
+                    "pattern": "^[\\x21-\\x7e]+$"
+                },
+                "Password": {
+                    "type": "string",
+                    "maxLength": 72,
+                    "minLength": 6,
+                    "pattern": "^[\\x21-\\x7e]+$"
+                }
+            },
+            "required": [
+                "Password",
+                "Username"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "properties": {
+        "Authentication": {
+            "$ref": "#/definitions/RelayAuthentication"
+        },
+        "RelayARN": {
+            "type": "string"
+        },
+        "RelayId": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9-]+$"
+        },
+        "RelayName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[\\x21-\\x7e]+$"
+        },
+        "ServerName": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "pattern": "^[\\x21-\\x7e]+$"
+        },
+        "ServerPort": {
+            "type": "number",
+            "maximum": 65535,
+            "minimum": 1
+        }
+    },
+    "required": [
+        "Authentication",
+        "RelayName",
+        "ServerName",
+        "ServerPort"
+    ],
+    "readOnlyProperties": [
+        "/properties/RelayARN",
+        "/properties/RelayId"
+    ],
+    "writeOnlyProperties": [
+        "/properties/Authentication"
+    ],
+    "primaryIdentifier": [
+        "/properties/RelayId"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "ses:GetRelay",
+                "ses:CreateRelay"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "ses:GetRelay"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "ses:GetRelay",
+                "ses:UpdateRelay"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "ses:GetRelay",
+                "ses:DeleteRelay"
+            ]
+        },
+        "list": {
+            "permissions": [
+                "ses:ListRelays"
+            ]
+        }
+    },
+    "additionalProperties": false
+}
