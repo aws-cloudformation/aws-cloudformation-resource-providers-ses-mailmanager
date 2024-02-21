@@ -1,0 +1,44 @@
+{
+    "Description": "new_description",
+    "RuleSetName": "new_rule_set_name",
+    "Rules": [
+        {
+            "Name": "new_rule_one",
+            "Conditions": [
+                {
+                    "StringExpression": {
+                        "Evaluate": {
+                            "Attribute": "MAIL_FROM"
+                        },
+                        "Operator": "CONTAINS",
+                        "Value": [
+                            "@amazon.com"
+                        ]
+                    }
+                }
+            ],
+            "Unless": [
+                {
+                    "StringExpression": {
+                        "Evaluate": {
+                            "Attribute": "MAIL_FROM"
+                        },
+                        "Operator": "CONTAINS",
+                        "Value": [
+                            "@badsender.com"
+                        ]
+                    }
+                }
+            ],
+            "Actions": [
+                {
+                    "WriteToS3": {
+                        "S3Bucket": "s3_bucket_name",
+                        "S3Prefix": "folder",
+                        "S3SseKmsKeyId": "kms_id"
+                    }
+                }
+            ]
+        }
+    ]
+}
