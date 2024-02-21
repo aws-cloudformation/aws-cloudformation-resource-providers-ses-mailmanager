@@ -1,0 +1,11 @@
+{
+    "RelayName": "relay_name",
+    "ServerName": "https://new.localhost",
+    "ServerPort": 25,
+    "Authentication": {
+        "PasswordAuthentication": {
+            "Username": "new_username",
+            "Password": "new_password"
+        }
+    }
+}
