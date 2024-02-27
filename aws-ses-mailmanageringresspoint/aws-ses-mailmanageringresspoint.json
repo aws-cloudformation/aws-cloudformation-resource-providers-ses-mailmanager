@@ -33,10 +33,6 @@
                 "OPEN_RELAY",
                 "AUTH_RELAY"
             ]
-        },
-        "Unit": {
-            "type": "object",
-            "additionalProperties": false
         }
     },
     "properties": {
@@ -96,7 +92,7 @@
         "/properties/Type"
     ],
     "writeOnlyProperties": [
-        "/properties/SmtpPassword"
+        "/properties/IngressPointConfiguration"
     ],
     "primaryIdentifier": [
         "/properties/IngressPointId"
