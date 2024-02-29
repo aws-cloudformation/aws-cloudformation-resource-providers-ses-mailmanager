@@ -16,7 +16,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#ingresspointconfiguration" title="IngressPointConfiguration">IngressPointConfiguration</a>" : <i><a href="ingresspointconfiguration.md">IngressPointConfiguration</a></i>,
         "<a href="#ingresspointname" title="IngressPointName">IngressPointName</a>" : <i>String</i>,
         "<a href="#rulesetid" title="RuleSetId">RuleSetId</a>" : <i>String</i>,
-        "<a href="#type" title="Type">Type</a>" : <i>String</i>
+        "<a href="#type" title="Type">Type</a>" : <i>String</i>,
     }
 }
 </pre>
@@ -67,7 +67,7 @@ _Maximum Length_: <code>63</code>
 
 _Pattern_: <code>^[A-Za-z0-9_\-]+$</code>
 
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
 #### RuleSetId
 
