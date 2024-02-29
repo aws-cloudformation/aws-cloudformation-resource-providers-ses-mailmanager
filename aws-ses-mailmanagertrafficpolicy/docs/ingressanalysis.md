@@ -1,4 +1,4 @@
-# AWS::SES::MailManagerRuleSet Analysis
+# AWS::SES::MailManagerTrafficPolicy IngressAnalysis
 
 ## Syntax
 

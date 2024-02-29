@@ -28,17 +28,19 @@
             "type": "object",
             "properties": {
                 "Analyzer": {
-                    "type": "string"
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9:_/+=,@.#-]+$"
                 },
                 "ResultField": {
                     "type": "string",
                     "maxLength": 256,
                     "minLength": 1,
-                    "pattern": "^[[:blank:]a-zA-Z0-9]+$"
+                    "pattern": "^[\\sa-zA-Z0-9_]+$"
                 }
             },
             "required": [
-                "Analyzer"
+                "Analyzer",
+                "ResultField"
             ],
             "additionalProperties": false
         },
@@ -46,11 +48,35 @@
             "type": "object",
             "properties": {
                 "TargetArchive": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 2048,
+                    "minLength": 1,
+                    "pattern": "^[a-zA-Z0-9:_/+=,@.#-]+$"
                 }
             },
             "required": [
                 "TargetArchive"
+            ],
+            "additionalProperties": false
+        },
+        "DeliverToMailboxAction": {
+            "type": "object",
+            "properties": {
+                "MailboxArn": {
+                    "type": "string",
+                    "maxLength": 2048,
+                    "minLength": 1,
+                    "pattern": "^[a-zA-Z0-9:_/+=,@.#-]+$"
+                },
+                "RoleArn": {
+                    "type": "string",
+                    "maxLength": 2048,
+                    "minLength": 20
+                }
+            },
+            "required": [
+                "MailboxArn",
+                "RoleArn"
             ],
             "additionalProperties": false
         },
@@ -69,7 +95,10 @@
             "type": "object",
             "properties": {
                 "Relay": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 2048,
+                    "minLength": 1,
+                    "pattern": "^[a-zA-Z0-9:_/+=,@.#-]+$"
                 },
                 "MailFrom": {
                     "$ref": "#/definitions/MailFrom"
@@ -78,6 +107,24 @@
             "required": [
                 "Relay"
             ],
+            "additionalProperties": false
+        },
+        "ReplaceRecipientAction": {
+            "type": "object",
+            "properties": {
+                "ReplaceWith": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "maxLength": 254,
+                        "minLength": 0,
+                        "pattern": "^[0-9A-Za-z@+.-]+$"
+                    },
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "uniqueItems": true
+                }
+            },
             "additionalProperties": false
         },
         "Rule": {
@@ -175,6 +222,19 @@
                 },
                 {
                     "type": "object",
+                    "title": "Send",
+                    "properties": {
+                        "Send": {
+                            "$ref": "#/definitions/SendAction"
+                        }
+                    },
+                    "required": [
+                        "Send"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
                     "title": "AddHeader",
                     "properties": {
                         "AddHeader": {
@@ -183,6 +243,32 @@
                     },
                     "required": [
                         "AddHeader"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "title": "ReplaceRecipient",
+                    "properties": {
+                        "ReplaceRecipient": {
+                            "$ref": "#/definitions/ReplaceRecipientAction"
+                        }
+                    },
+                    "required": [
+                        "ReplaceRecipient"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "title": "DeliverToMailbox",
+                    "properties": {
+                        "DeliverToMailbox": {
+                            "$ref": "#/definitions/DeliverToMailboxAction"
+                        }
+                    },
+                    "required": [
+                        "DeliverToMailbox"
                     ],
                     "additionalProperties": false
                 }
@@ -677,8 +763,38 @@
             ],
             "additionalProperties": false
         },
-        "Unit": {
+        "SendAction": {
             "type": "object",
+            "properties": {
+                "RoleArn": {
+                    "type": "string",
+                    "maxLength": 2048,
+                    "minLength": 20
+                }
+            },
+            "required": [
+                "RoleArn"
+            ],
+            "additionalProperties": false
+        },
+        "Tag": {
+            "type": "object",
+            "properties": {
+                "Key": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 1
+                },
+                "Value": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "minLength": 0
+                }
+            },
+            "required": [
+                "Key",
+                "Value"
+            ],
             "additionalProperties": false
         }
     },
@@ -693,7 +809,7 @@
             "type": "string",
             "maxLength": 256,
             "minLength": 0,
-            "pattern": "^[[:blank:])(\na-zA-Z0-9_.-]*$"
+            "pattern": "^[\\s)(a-zA-Z0-9_.-]*$"
         },
         "RuleSetARN": {
             "type": "string"
@@ -716,6 +832,12 @@
             },
             "maxItems": 40,
             "minItems": 0
+        },
+        "Tags": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Tag"
+            }
         }
     },
     "required": [
@@ -726,6 +848,12 @@
     "readOnlyProperties": [
         "/properties/RuleSetARN",
         "/properties/RuleSetId"
+    ],
+    "writeOnlyProperties": [
+        "/properties/Tags"
+    ],
+    "createOnlyProperties": [
+        "/properties/Tags"
     ],
     "primaryIdentifier": [
         "/properties/RuleSetId"
@@ -750,7 +878,6 @@
         },
         "delete": {
             "permissions": [
-                "ses:GetRuleSet",
                 "ses:DeleteRuleSet"
             ]
         },

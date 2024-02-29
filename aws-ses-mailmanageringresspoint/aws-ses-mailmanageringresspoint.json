@@ -23,8 +23,7 @@
                 "UPDATING",
                 "ACTIVE",
                 "CLOSED",
-                "FAILED",
-                "DELETED"
+                "FAILED"
             ]
         },
         "IngressPointType": {
@@ -121,7 +120,6 @@
         },
         "delete": {
             "permissions": [
-                "ses:GetIngressPoint",
                 "ses:DeleteIngressPoint"
             ]
         },
