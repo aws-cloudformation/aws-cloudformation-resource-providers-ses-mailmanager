@@ -68,6 +68,9 @@
         },
         "Type": {
             "$ref": "#/definitions/IngressPointType"
+        },
+        "IngressPointStatus": {
+            "$ref": "#/definitions/IngressPointStatus"
         }
     },
     "tagging": {
@@ -89,7 +92,8 @@
         "/properties/ARecord"
     ],
     "createOnlyProperties": [
-        "/properties/Type"
+        "/properties/Type",
+        "/properties/IngressPointName"
     ],
     "writeOnlyProperties": [
         "/properties/IngressPointConfiguration"
