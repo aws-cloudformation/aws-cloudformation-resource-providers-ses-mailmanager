@@ -14,7 +14,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#description" title="Description">Description</a>" : <i>String</i>,
         "<a href="#rulesetname" title="RuleSetName">RuleSetName</a>" : <i>String</i>,
-        "<a href="#rules" title="Rules">Rules</a>" : <i>[ <a href="rule.md">Rule</a>, ... ]</i>
+        "<a href="#rules" title="Rules">Rules</a>" : <i>[ <a href="rule.md">Rule</a>, ... ]</i>,
+        "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>
     }
 }
 </pre>
@@ -28,6 +29,8 @@ Properties:
     <a href="#rulesetname" title="RuleSetName">RuleSetName</a>: <i>String</i>
     <a href="#rules" title="Rules">Rules</a>: <i>
       - <a href="rule.md">Rule</a></i>
+    <a href="#tags" title="Tags">Tags</a>: <i>
+      - <a href="tag.md">Tag</a></i>
 </pre>
 
 ## Properties
@@ -40,8 +43,7 @@ _Type_: String
 
 _Maximum Length_: <code>256</code>
 
-_Pattern_: <code>^[[:blank:])(
-a-zA-Z0-9_.-]*$</code>
+_Pattern_: <code>^[\s)(a-zA-Z0-9_.-]*$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -66,6 +68,14 @@ _Required_: Yes
 _Type_: List of <a href="rule.md">Rule</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### Tags
+
+_Required_: No
+
+_Type_: List of <a href="tag.md">Tag</a>
+
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
 ## Return Values
 

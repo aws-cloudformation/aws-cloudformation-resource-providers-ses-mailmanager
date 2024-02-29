@@ -50,6 +50,19 @@
                         "TlsExpression"
                     ],
                     "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "title": "BooleanExpression",
+                    "properties": {
+                        "BooleanExpression": {
+                            "$ref": "#/definitions/IngressBooleanExpression"
+                        }
+                    },
+                    "required": [
+                        "BooleanExpression"
+                    ],
+                    "additionalProperties": false
                 }
             ]
         },
@@ -72,6 +85,66 @@
                 "Conditions"
             ],
             "additionalProperties": false
+        },
+        "IngressAnalysis": {
+            "type": "object",
+            "properties": {
+                "Analyzer": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9:_/+=,@.#-]+$"
+                },
+                "ResultField": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "minLength": 1,
+                    "pattern": "^[\\sa-zA-Z0-9_]+$"
+                }
+            },
+            "required": [
+                "Analyzer",
+                "ResultField"
+            ],
+            "additionalProperties": false
+        },
+        "IngressBooleanExpression": {
+            "type": "object",
+            "properties": {
+                "Evaluate": {
+                    "$ref": "#/definitions/IngressBooleanToEvaluate"
+                },
+                "Operator": {
+                    "$ref": "#/definitions/IngressBooleanOperator"
+                }
+            },
+            "required": [
+                "Evaluate",
+                "Operator"
+            ],
+            "additionalProperties": false
+        },
+        "IngressBooleanOperator": {
+            "type": "string",
+            "enum": [
+                "IS_TRUE",
+                "IS_FALSE"
+            ]
+        },
+        "IngressBooleanToEvaluate": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "title": "Analysis",
+                    "properties": {
+                        "Analysis": {
+                            "$ref": "#/definitions/IngressAnalysis"
+                        }
+                    },
+                    "required": [
+                        "Analysis"
+                    ],
+                    "additionalProperties": false
+                }
+            ]
         },
         "IngressIpOperator": {
             "type": "string",
@@ -239,11 +312,13 @@
                     "additionalProperties": false
                 }
             ]
-        },
-        "Unit": {
-            "type": "object",
-            "additionalProperties": false
         }
+    },
+    "tagging": {
+        "taggable": false,
+        "tagOnCreate": false,
+        "tagUpdatable": false,
+        "cloudFormationSystemTags": false
     },
     "properties": {
         "DefaultAction": {
@@ -273,12 +348,6 @@
             "type": "number",
             "minimum": 1
         }
-    },
-    "tagging": {
-        "taggable": false,
-        "tagOnCreate": false,
-        "tagUpdatable": false,
-        "cloudFormationSystemTags": false
     },
     "required": [
         "DefaultAction",
@@ -312,7 +381,6 @@
         },
         "delete": {
             "permissions": [
-                "ses:GetTrafficPolicy",
                 "ses:DeleteTrafficPolicy"
             ]
         },

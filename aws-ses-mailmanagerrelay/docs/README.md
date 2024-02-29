@@ -15,7 +15,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#authentication" title="Authentication">Authentication</a>" : <i><a href="relayauthentication.md">RelayAuthentication</a></i>,
         "<a href="#relayname" title="RelayName">RelayName</a>" : <i>String</i>,
         "<a href="#servername" title="ServerName">ServerName</a>" : <i>String</i>,
-        "<a href="#serverport" title="ServerPort">ServerPort</a>" : <i>Double</i>
+        "<a href="#serverport" title="ServerPort">ServerPort</a>" : <i>Double</i>,
+        "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>
     }
 }
 </pre>
@@ -29,6 +30,8 @@ Properties:
     <a href="#relayname" title="RelayName">RelayName</a>: <i>String</i>
     <a href="#servername" title="ServerName">ServerName</a>: <i>String</i>
     <a href="#serverport" title="ServerPort">ServerPort</a>: <i>Double</i>
+    <a href="#tags" title="Tags">Tags</a>: <i>
+      - <a href="tag.md">Tag</a></i>
 </pre>
 
 ## Properties
@@ -76,6 +79,14 @@ _Required_: Yes
 _Type_: Double
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### Tags
+
+_Required_: No
+
+_Type_: List of <a href="tag.md">Tag</a>
+
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
 ## Return Values
 

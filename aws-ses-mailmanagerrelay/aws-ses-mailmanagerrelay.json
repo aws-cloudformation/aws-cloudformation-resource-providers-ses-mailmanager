@@ -41,7 +41,33 @@
                 "Username"
             ],
             "additionalProperties": false
+        },
+        "Tag": {
+            "type": "object",
+            "properties": {
+                "Key": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 1
+                },
+                "Value": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "minLength": 0
+                }
+            },
+            "required": [
+                "Key",
+                "Value"
+            ],
+            "additionalProperties": false
         }
+    },
+    "tagging": {
+        "taggable": false,
+        "tagOnCreate": false,
+        "tagUpdatable": false,
+        "cloudFormationSystemTags": false
     },
     "properties": {
         "Authentication": {
@@ -72,6 +98,12 @@
             "type": "number",
             "maximum": 65535,
             "minimum": 1
+        },
+        "Tags": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Tag"
+            }
         }
     },
     "required": [
@@ -85,7 +117,11 @@
         "/properties/RelayId"
     ],
     "writeOnlyProperties": [
+        "/properties/Tags",
         "/properties/Authentication"
+    ],
+    "createOnlyProperties": [
+        "/properties/Tags"
     ],
     "primaryIdentifier": [
         "/properties/RelayId"
@@ -110,7 +146,6 @@
         },
         "delete": {
             "permissions": [
-                "ses:GetRelay",
                 "ses:DeleteRelay"
             ]
         },
