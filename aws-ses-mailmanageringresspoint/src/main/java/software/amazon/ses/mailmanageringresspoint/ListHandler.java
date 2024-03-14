@@ -1,43 +1,43 @@
 package software.amazon.ses.mailmanageringresspoint;
 
-import software.amazon.awssdk.awscore.AwsRequest;
-import software.amazon.awssdk.awscore.AwsResponse;
+import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
-import java.util.ArrayList;
-import java.util.List;
 
-public class ListHandler extends BaseHandler<CallbackContext> {
+public class ListHandler extends BaseHandlerStd {
+
+    private Logger logger;
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-        final AmazonWebServicesClientProxy proxy,
-        final ResourceHandlerRequest<ResourceModel> request,
-        final CallbackContext callbackContext,
-        final Logger logger) {
+            final AmazonWebServicesClientProxy proxy,
+            final ResourceHandlerRequest<ResourceModel> request,
+            final CallbackContext callbackContext,
+            final ProxyClient<MailManagerClient> proxyClient,
+            final Logger logger
+    ) {
 
-        final List<ResourceModel> models = new ArrayList<>();
+        this.logger = logger;
 
-        // STEP 1 [TODO: construct a body of a request]
-        final AwsRequest awsRequest = Translator.translateToListRequest(request.getNextToken());
+        final ResourceModel model = request.getDesiredResourceState();
+        final String clientRequestToken = request.getClientRequestToken();
 
-        // STEP 2 [TODO: make an api call]
-        AwsResponse awsResponse = null; // proxy.injectCredentialsAndInvokeV2(awsRequest, ClientBuilder.getClient()::describeLogGroups);
-
-        // STEP 3 [TODO: get a token for the next page]
-        String nextToken = null;
-
-        // STEP 4 [TODO: construct resource models]
-        // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/master/aws-logs-loggroup/src/main/java/software/amazon/logs/loggroup/ListHandler.java#L19-L21
-
-        return ProgressEvent.<ResourceModel, CallbackContext>builder()
-            .resourceModels(models)
-            .nextToken(nextToken)
-            .status(OperationStatus.SUCCESS)
-            .build();
+        return proxy.initiate("AWS-SES-MailManagerIngressPoint::List", proxyClient, model, callbackContext)
+                .translateToServiceRequest(_resourceModel -> Translator.translateToListRequest(request.getNextToken()))
+                .makeServiceCall((listIngressPointsRequest, _proxyClient) ->
+                        _proxyClient.injectCredentialsAndInvokeV2(listIngressPointsRequest, _proxyClient.client()::listIngressPoints))
+                .handleError((listIngressPointsRequest, _exception, _proxyClient, _resourceModel, _callbackContext) ->
+                        handleError(_exception, _resourceModel, _callbackContext, logger, clientRequestToken))
+                .done((listIngressPointsRequest, listIngressPointsResponse, _proxyClient, _resourceModel, _callbackContext) ->
+                        ProgressEvent.<ResourceModel, CallbackContext>builder()
+                                .resourceModels(Translator.translateFromListResponse(listIngressPointsResponse))
+                                .status(OperationStatus.SUCCESS)
+                                .nextToken(listIngressPointsResponse.nextToken())
+                                .build());
     }
 }

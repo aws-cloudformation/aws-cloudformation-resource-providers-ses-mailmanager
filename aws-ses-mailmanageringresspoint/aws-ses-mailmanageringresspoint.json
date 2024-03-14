@@ -120,6 +120,7 @@
         },
         "delete": {
             "permissions": [
+                "ses:GetIngressPoint",
                 "ses:DeleteIngressPoint"
             ]
         },
