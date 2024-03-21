@@ -1,127 +1,152 @@
 package software.amazon.ses.mailmanageringresspoint;
 
-import com.google.common.collect.Lists;
+import lombok.NonNull;
 import software.amazon.awssdk.awscore.AwsRequest;
-import software.amazon.awssdk.awscore.AwsResponse;
+import software.amazon.awssdk.services.mailmanager.model.CreateIngressPointRequest;
+import software.amazon.awssdk.services.mailmanager.model.DeleteIngressPointRequest;
+import software.amazon.awssdk.services.mailmanager.model.GetIngressPointRequest;
+import software.amazon.awssdk.services.mailmanager.model.GetIngressPointResponse;
+import software.amazon.awssdk.services.mailmanager.model.IngressPointConfiguration;
+import software.amazon.awssdk.services.mailmanager.model.IngressPointType;
+import software.amazon.awssdk.services.mailmanager.model.ListIngressPointsRequest;
+import software.amazon.awssdk.services.mailmanager.model.ListIngressPointsResponse;
+import software.amazon.awssdk.services.mailmanager.model.UpdateIngressPointRequest;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * This class is a centralized placeholder for
- *  - api request construction
- *  - object translation to/from aws sdk
- *  - resource model construction for read/list handlers
- */
-
 public class Translator {
 
   /**
-   * Request to create a resource
+   * Request to create a MailManager IngressPoint resource
+   *
    * @param model resource model
-   * @return awsRequest the aws service request to create a resource
+   * @return CreateIngressPointRequest the aws service request to create a resource
    */
-  static AwsRequest translateToCreateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static CreateIngressPointRequest translateToCreateRequest(final ResourceModel model) {
+    modelValidator(model);
+
+    return CreateIngressPointRequest.builder()
+            .ingressPointName(model.getIngressPointName())
+            .type(model.getType())
+            .ingressPointConfiguration(
+                    model.getIngressPointConfiguration() == null ?
+                            null : IngressPointConfiguration.builder()
+                            .smtpPassword(model.getIngressPointConfiguration().getSmtpPassword())
+                            .secretArn(model.getIngressPointConfiguration().getSecretArn())
+                            .build()
+            )
+            .ruleSetId(model.getRuleSetId())
+            .trafficPolicyId(model.getTrafficPolicyId())
+            .build();
   }
 
   /**
-   * Request to read a resource
+   * Request to read a MailManager IngressPoint resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to describe a resource
    */
-  static AwsRequest translateToReadRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L20-L24
-    return awsRequest;
+  static GetIngressPointRequest translateToReadRequest(@NonNull final ResourceModel model) {
+    return GetIngressPointRequest.builder()
+            .ingressPointId(model.getIngressPointId())
+            .build();
   }
 
   /**
-   * Translates resource object from sdk into a resource model
-   * @param awsResponse the aws service describe resource response
+   * Translates MailManager IngressPoint resource object from sdk into a resource model
+   *
+   * @param ingressPointResponse the aws service describe resource response
    * @return model resource model
    */
-  static ResourceModel translateFromReadResponse(final AwsResponse awsResponse) {
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L58-L73
+  static ResourceModel translateFromReadResponse(@NonNull final GetIngressPointResponse ingressPointResponse) {
     return ResourceModel.builder()
-        //.someProperty(response.property())
-        .build();
+            .ingressPointName(ingressPointResponse.ingressPointName())
+            .ingressPointId(ingressPointResponse.ingressPointId())
+            .ingressPointArn(ingressPointResponse.ingressPointArn())
+            .trafficPolicyId(ingressPointResponse.trafficPolicyId())
+            .ruleSetId(ingressPointResponse.ruleSetId())
+            .ingressPointStatus(ingressPointResponse.statusAsString())
+            .type(ingressPointResponse.typeAsString())
+            .aRecord(ingressPointResponse.aRecord())
+            .build();
   }
 
   /**
    * Request to delete a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to delete a resource
    */
-  static AwsRequest translateToDeleteRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L33-L37
-    return awsRequest;
+  static DeleteIngressPointRequest translateToDeleteRequest(final ResourceModel model) {
+    return DeleteIngressPointRequest.builder()
+            .ingressPointId(model.getIngressPointId())
+            .build();
   }
 
   /**
    * Request to update properties of a previously created resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to modify a resource
    */
-  static AwsRequest translateToFirstUpdateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L45-L50
-    return awsRequest;
+  static UpdateIngressPointRequest translateToUpdateRequest(final ResourceModel model) {
+    modelValidator(model);
+    UpdateIngressPointRequest.Builder builder = UpdateIngressPointRequest.builder()
+            .ingressPointId(model.getIngressPointId())
+            .ruleSetId(model.getRuleSetId())
+            .trafficPolicyId(model.getTrafficPolicyId());
+
+    // AUTH RELAY
+    if (Objects.equals(model.getType(), IngressPointType.AUTH_RELAY.toString())) {
+      return builder.ingressPointConfiguration(IngressPointConfiguration.builder()
+              .smtpPassword(model.getIngressPointConfiguration().getSmtpPassword()).build()
+      ).build();
+    }
+
+    // OPEN RELAY
+    return builder.build();
   }
 
-  /**
-   * Request to update some other properties that could not be provisioned through first update request
-   * @param model resource model
-   * @return awsRequest the aws service request to modify a resource
-   */
-  static AwsRequest translateToSecondUpdateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    return awsRequest;
+  private static void modelValidator(final ResourceModel model) {
+    if (Objects.equals(model.getType(), IngressPointType.OPEN_RELAY.toString()) && model.getIngressPointConfiguration() != null) {
+      throw new CfnInvalidRequestException("An OPEN_RELAY MUST NOT be established using IngressPointConfiguration, since it's utilized for AUTH_RELAY authentication.");
+    }
   }
 
   /**
    * Request to list resources
+   *
    * @param nextToken token passed to the aws service list resources request
    * @return awsRequest the aws service request to list resources within aws account
    */
-  static AwsRequest translateToListRequest(final String nextToken) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L26-L31
-    return awsRequest;
+  static ListIngressPointsRequest translateToListRequest(final String nextToken) {
+    return ListIngressPointsRequest.builder()
+            .nextToken(nextToken)
+            .build();
   }
 
-  /**
-   * Translates resource objects from sdk into a resource model (primary identifier only)
-   * @param awsResponse the aws service describe resource response
-   * @return list of resource models
-   */
-  static List<ResourceModel> translateFromListRequest(final AwsResponse awsResponse) {
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L75-L82
-    return streamOfOrEmpty(Lists.newArrayList())
-        .map(resource -> ResourceModel.builder()
-            // include only primary identifier
-            .build())
-        .collect(Collectors.toList());
+  static List<ResourceModel> translateFromListResponse(final ListIngressPointsResponse response) {
+    return streamOfOrEmpty(response.ingressPoints())
+            .map(ingressPoint -> ResourceModel.builder()
+                    // include only primary identifier
+                    .ingressPointId(ingressPoint.ingressPointId())
+                    .build()
+            )
+            .collect(Collectors.toList());
   }
 
   private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
     return Optional.ofNullable(collection)
-        .map(Collection::stream)
-        .orElseGet(Stream::empty);
+            .map(Collection::stream)
+            .orElseGet(Stream::empty);
   }
 
   /**

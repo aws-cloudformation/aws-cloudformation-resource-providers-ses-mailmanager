@@ -4,6 +4,6 @@
     "TrafficPolicyId": "",
     "RuleSetId": "",
     "IngressPointConfiguration": {
-        "SmtpPassword": "password"
+        "SmtpPassword": ""
     }
 }
