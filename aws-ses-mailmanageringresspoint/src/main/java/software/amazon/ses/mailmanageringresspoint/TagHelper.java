@@ -40,11 +40,11 @@ public class TagHelper {
             return Collections.emptyMap();
         }
         return tags.stream()
-            .filter(tag -> tag.value() != null)
-            .collect(Collectors.toMap(
-                Tag::key,
-                Tag::value,
-                (oldValue, newValue) -> newValue));
+                .filter(tag -> tag.value() != null)
+                .collect(Collectors.toMap(
+                        Tag::key,
+                        Tag::value,
+                        (oldValue, newValue) -> newValue));
     }
 
     /**
@@ -62,12 +62,12 @@ public class TagHelper {
             return Collections.emptySet();
         }
         return tagMap.entrySet().stream()
-            .filter(tag -> tag.getValue() != null)
-            .map(tag -> Tag.builder()
-                .key(tag.getKey())
-                .value(tag.getValue())
-                .build())
-            .collect(Collectors.toSet());
+                .filter(tag -> tag.getValue() != null)
+                .map(tag -> Tag.builder()
+                        .key(tag.getKey())
+                        .value(tag.getValue())
+                        .build())
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -148,10 +148,10 @@ public class TagHelper {
      */
     public Map<String, String> generateTagsToAdd(final Map<String, String> previousTags, final Map<String, String> desiredTags) {
         return desiredTags.entrySet().stream()
-            .filter(e -> !previousTags.containsKey(e.getKey()) || !Objects.equals(previousTags.get(e.getKey()), e.getValue()))
-            .collect(Collectors.toMap(
-                Map.Entry::getKey,
-                Map.Entry::getValue));
+                .filter(e -> !previousTags.containsKey(e.getKey()) || !Objects.equals(previousTags.get(e.getKey()), e.getValue()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue));
     }
 
     /**
@@ -163,8 +163,8 @@ public class TagHelper {
         final Set<String> desiredTagNames = desiredTags.keySet();
 
         return previousTags.keySet().stream()
-            .filter(tagName -> !desiredTagNames.contains(tagName))
-            .collect(Collectors.toSet());
+                .filter(tagName -> !desiredTagNames.contains(tagName))
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -200,14 +200,14 @@ public class TagHelper {
 
         // TODO: change untagResource in the method to your service API according to your SDK
         return proxy.initiate("AWS-SES-MailManagerIngressPoint::TagOps", serviceClient, resourceModel, callbackContext)
-            .translateToServiceRequest(model ->
-                Translator.tagResourceRequest(model, addedTags))
-            .makeServiceCall((request, client) -> {
-                return (AwsResponse) null;
-                // TODO: replace the return null with your invoke log to call tagResource API to add tags
-                // e.g. proxy.injectCredentialsAndInvokeV2(request, client.client()::tagResource))
-            })
-            .progress();
+                .translateToServiceRequest(model ->
+                        Translator.tagResourceRequest(model, addedTags))
+                .makeServiceCall((request, client) -> {
+                    return (AwsResponse) null;
+                    // TODO: replace the return null with your invoke log to call tagResource API to add tags
+                    // e.g. proxy.injectCredentialsAndInvokeV2(request, client.client()::tagResource))
+                })
+                .progress();
     }
 
     /**
@@ -224,14 +224,14 @@ public class TagHelper {
 
         // TODO: change untagResource in the method to your service API according to your SDK
         return proxy.initiate("AWS-SES-MailManagerIngressPoint::TagOps", serviceClient, resourceModel, callbackContext)
-            .translateToServiceRequest(model ->
-                Translator.untagResourceRequest(model, removedTags))
-            .makeServiceCall((request, client) -> {
-                return (AwsResponse) null;
-                // TODO: replace the return null with your invoke log to call untag API to remove tags
-                // e.g. proxy.injectCredentialsAndInvokeV2(request, client.client()::untagResource)
-            })
-            .progress();
+                .translateToServiceRequest(model ->
+                        Translator.untagResourceRequest(model, removedTags))
+                .makeServiceCall((request, client) -> {
+                    return (AwsResponse) null;
+                    // TODO: replace the return null with your invoke log to call untag API to remove tags
+                    // e.g. proxy.injectCredentialsAndInvokeV2(request, client.client()::untagResource)
+                })
+                .progress();
     }
 
 }
