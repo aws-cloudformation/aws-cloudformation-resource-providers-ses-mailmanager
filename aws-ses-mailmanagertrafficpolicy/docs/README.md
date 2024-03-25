@@ -13,9 +13,9 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Type" : "AWS::SES::MailManagerTrafficPolicy",
     "Properties" : {
         "<a href="#defaultaction" title="DefaultAction">DefaultAction</a>" : <i>String</i>,
-        "<a href="#trafficpolicyname" title="TrafficPolicyName">TrafficPolicyName</a>" : <i>String</i>,
+        "<a href="#maxmessagesizebytes" title="MaxMessageSizeBytes">MaxMessageSizeBytes</a>" : <i>Double</i>,
         "<a href="#policystatements" title="PolicyStatements">PolicyStatements</a>" : <i>[ <a href="policystatement.md">PolicyStatement</a>, ... ]</i>,
-        "<a href="#maxmessagesizebytes" title="MaxMessageSizeBytes">MaxMessageSizeBytes</a>" : <i>Double</i>
+        "<a href="#trafficpolicyname" title="TrafficPolicyName">TrafficPolicyName</a>" : <i>String</i>
     }
 }
 </pre>
@@ -26,10 +26,10 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 Type: AWS::SES::MailManagerTrafficPolicy
 Properties:
     <a href="#defaultaction" title="DefaultAction">DefaultAction</a>: <i>String</i>
-    <a href="#trafficpolicyname" title="TrafficPolicyName">TrafficPolicyName</a>: <i>String</i>
+    <a href="#maxmessagesizebytes" title="MaxMessageSizeBytes">MaxMessageSizeBytes</a>: <i>Double</i>
     <a href="#policystatements" title="PolicyStatements">PolicyStatements</a>: <i>
       - <a href="policystatement.md">PolicyStatement</a></i>
-    <a href="#maxmessagesizebytes" title="MaxMessageSizeBytes">MaxMessageSizeBytes</a>: <i>Double</i>
+    <a href="#trafficpolicyname" title="TrafficPolicyName">TrafficPolicyName</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -44,17 +44,11 @@ _Allowed Values_: <code>ALLOW</code> | <code>DENY</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### TrafficPolicyName
+#### MaxMessageSizeBytes
 
-_Required_: Yes
+_Required_: No
 
-_Type_: String
-
-_Minimum Length_: <code>3</code>
-
-_Maximum Length_: <code>63</code>
-
-_Pattern_: <code>^[A-Za-z0-9_\-]+$</code>
+_Type_: Double
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -66,11 +60,17 @@ _Type_: List of <a href="policystatement.md">PolicyStatement</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### MaxMessageSizeBytes
+#### TrafficPolicyName
 
 _Required_: No
 
-_Type_: Double
+_Type_: String
+
+_Minimum Length_: <code>3</code>
+
+_Maximum Length_: <code>63</code>
+
+_Pattern_: <code>^[A-Za-z0-9_\-]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

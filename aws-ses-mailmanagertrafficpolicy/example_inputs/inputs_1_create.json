@@ -1,6 +1,4 @@
 {
-    "FilterSetName": "Filter",
-    "DefaultAction": "ALLOW",
     "FilterStatements": [
         {
             "Conditions": [
@@ -11,11 +9,9 @@
                         },
                         "Operator": "ENDS_WITH",
                         "Value": [
-                            "@amazon.com"
+                            "@gmail.com"
                         ]
-                    },
-                    "IpExpression": null,
-                    "TlsExpression": null
+                    }
                 },
                 {
                     "StringExpression": {
@@ -24,11 +20,9 @@
                         },
                         "Operator": "CONTAINS",
                         "Value": [
-                            "zlinzhou"
+                            "anyone"
                         ]
-                    },
-                    "IpExpression": null,
-                    "TlsExpression": null
+                    }
                 }
             ],
             "Action": "ALLOW"
@@ -36,8 +30,6 @@
         {
             "Conditions": [
                 {
-                    "StringExpression": null,
-                    "IpExpression": null,
                     "TlsExpression": {
                         "Evaluate": {
                             "Attribute": "TLS_PROTOCOL"
@@ -60,9 +52,7 @@
                         "Value": [
                             "@trashmaker.com"
                         ]
-                    },
-                    "IpExpression": null,
-                    "TlsExpression": null
+                    }
                 }
             ],
             "Action": "DENY"
@@ -70,7 +60,6 @@
         {
             "Conditions": [
                 {
-                    "StringExpression": null,
                     "IpExpression": {
                         "Evaluate": {
                             "Attribute": "SENDER_IP"
@@ -79,12 +68,12 @@
                         "Value": [
                             "127.0.0.0/16"
                         ]
-                    },
-                    "TlsExpression": null
+                    }
                 }
             ],
             "Action": "DENY"
         }
     ],
-    "MaxMessageSizeBytes": 1000.0
+    "DefaultAction": "ALLOW",
+    "MaxMessageSizeBytes": 1000
 }

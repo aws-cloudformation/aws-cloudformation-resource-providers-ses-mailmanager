@@ -1,8 +1,15 @@
 package software.amazon.ses.mailmanagertrafficpolicy;
 
-import com.google.common.collect.Lists;
 import software.amazon.awssdk.awscore.AwsRequest;
-import software.amazon.awssdk.awscore.AwsResponse;
+import software.amazon.awssdk.services.mailmanager.model.CreateTrafficPolicyRequest;
+import software.amazon.awssdk.services.mailmanager.model.DeleteTrafficPolicyRequest;
+import software.amazon.awssdk.services.mailmanager.model.GetTrafficPolicyRequest;
+import software.amazon.awssdk.services.mailmanager.model.GetTrafficPolicyResponse;
+import software.amazon.awssdk.services.mailmanager.model.ListTrafficPoliciesRequest;
+import software.amazon.awssdk.services.mailmanager.model.ListTrafficPoliciesResponse;
+import software.amazon.awssdk.services.mailmanager.model.UpdateTrafficPolicyRequest;
+import software.amazon.ses.mailmanagertrafficpolicy.utils.PolicyStatementConvertorFromSdk;
+import software.amazon.ses.mailmanagertrafficpolicy.utils.PolicyStatementConvertorToSdk;
 
 import java.util.Collection;
 import java.util.List;
@@ -12,120 +19,117 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * This class is a centralized placeholder for
- *  - api request construction
- *  - object translation to/from aws sdk
- *  - resource model construction for read/list handlers
- */
 
 public class Translator {
 
   /**
    * Request to create a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest translateToCreateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static CreateTrafficPolicyRequest translateToCreateRequest(final ResourceModel model) {
+    return CreateTrafficPolicyRequest.builder()
+            .trafficPolicyName(model.getTrafficPolicyName())
+            .policyStatements(PolicyStatementConvertorToSdk.ConvertToSdk(model.getPolicyStatements()))
+            .maxMessageSizeBytes(model.getMaxMessageSizeBytes() == null ? null : model.getMaxMessageSizeBytes().intValue())
+            .defaultAction(model.getDefaultAction())
+            .build();
   }
 
   /**
    * Request to read a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to describe a resource
    */
-  static AwsRequest translateToReadRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L20-L24
-    return awsRequest;
+  static GetTrafficPolicyRequest translateToReadRequest(final ResourceModel model) {
+    return GetTrafficPolicyRequest.builder()
+            .trafficPolicyId(model.getTrafficPolicyId())
+            .build();
   }
 
   /**
    * Translates resource object from sdk into a resource model
-   * @param awsResponse the aws service describe resource response
+   *
+   * @param response the aws service describe resource response
    * @return model resource model
    */
-  static ResourceModel translateFromReadResponse(final AwsResponse awsResponse) {
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L58-L73
+  static ResourceModel translateFromReadResponse(final GetTrafficPolicyResponse response) {
     return ResourceModel.builder()
-        //.someProperty(response.property())
-        .build();
+            .trafficPolicyId(response.trafficPolicyId())
+            .trafficPolicyName(response.trafficPolicyName())
+            .trafficPolicyArn(response.trafficPolicyArn())
+            .policyStatements(PolicyStatementConvertorFromSdk.ConvertFromSdk(response.policyStatements()))
+            .maxMessageSizeBytes(response.maxMessageSizeBytes() == null ? 0 : Double.valueOf(response.maxMessageSizeBytes()))
+            .defaultAction(response.defaultActionAsString())
+            .build();
   }
 
   /**
    * Request to delete a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to delete a resource
    */
-  static AwsRequest translateToDeleteRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L33-L37
-    return awsRequest;
+  static DeleteTrafficPolicyRequest translateToDeleteRequest(final ResourceModel model) {
+    return DeleteTrafficPolicyRequest.builder()
+            .trafficPolicyId(model.getTrafficPolicyId())
+            .build();
   }
 
   /**
    * Request to update properties of a previously created resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to modify a resource
    */
-  static AwsRequest translateToFirstUpdateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L45-L50
-    return awsRequest;
-  }
-
-  /**
-   * Request to update some other properties that could not be provisioned through first update request
-   * @param model resource model
-   * @return awsRequest the aws service request to modify a resource
-   */
-  static AwsRequest translateToSecondUpdateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    return awsRequest;
+  static UpdateTrafficPolicyRequest translateToUpdateRequest(final ResourceModel model) {
+    return UpdateTrafficPolicyRequest.builder()
+            .trafficPolicyId(model.getTrafficPolicyId())
+            .trafficPolicyName(model.getTrafficPolicyName())
+            .policyStatements(PolicyStatementConvertorToSdk.ConvertToSdk(model.getPolicyStatements()))
+            .maxMessageSizeBytes(model.getMaxMessageSizeBytes() == null ? null : model.getMaxMessageSizeBytes().intValue())
+            .defaultAction(model.getDefaultAction())
+            .build();
   }
 
   /**
    * Request to list resources
+   *
    * @param nextToken token passed to the aws service list resources request
    * @return awsRequest the aws service request to list resources within aws account
    */
-  static AwsRequest translateToListRequest(final String nextToken) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L26-L31
-    return awsRequest;
+  static ListTrafficPoliciesRequest translateToListRequest(final String nextToken) {
+    return ListTrafficPoliciesRequest.builder()
+            .nextToken(nextToken)
+            .build();
   }
 
   /**
    * Translates resource objects from sdk into a resource model (primary identifier only)
-   * @param awsResponse the aws service describe resource response
+   *
+   * @param response the aws service describe resource response
    * @return list of resource models
    */
-  static List<ResourceModel> translateFromListRequest(final AwsResponse awsResponse) {
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L75-L82
-    return streamOfOrEmpty(Lists.newArrayList())
-        .map(resource -> ResourceModel.builder()
-            // include only primary identifier
-            .build())
-        .collect(Collectors.toList());
+  static List<ResourceModel> translateFromListResponse(final ListTrafficPoliciesResponse response) {
+    return streamOfOrEmpty(response.trafficPolicies())
+            .map(resource -> ResourceModel.builder()
+                    // include only primary identifier
+                    .trafficPolicyId(resource.trafficPolicyId())
+                    .build())
+            .collect(Collectors.toList());
   }
 
   private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
     return Optional.ofNullable(collection)
-        .map(Collection::stream)
-        .orElseGet(Stream::empty);
+            .map(Collection::stream)
+            .orElseGet(Stream::empty);
   }
 
   /**
    * Request to add tags to a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
@@ -138,6 +142,7 @@ public class Translator {
 
   /**
    * Request to add tags to a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
