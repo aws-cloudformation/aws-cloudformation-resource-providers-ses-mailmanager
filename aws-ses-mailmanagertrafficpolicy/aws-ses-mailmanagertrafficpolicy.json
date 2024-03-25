@@ -10,82 +10,6 @@
                 "DENY"
             ]
         },
-        "PolicyCondition": {
-            "oneOf": [
-                {
-                    "type": "object",
-                    "title": "StringExpression",
-                    "properties": {
-                        "StringExpression": {
-                            "$ref": "#/definitions/IngressStringExpression"
-                        }
-                    },
-                    "required": [
-                        "StringExpression"
-                    ],
-                    "additionalProperties": false
-                },
-                {
-                    "type": "object",
-                    "title": "IpExpression",
-                    "properties": {
-                        "IpExpression": {
-                            "$ref": "#/definitions/IngressIpv4Expression"
-                        }
-                    },
-                    "required": [
-                        "IpExpression"
-                    ],
-                    "additionalProperties": false
-                },
-                {
-                    "type": "object",
-                    "title": "TlsExpression",
-                    "properties": {
-                        "TlsExpression": {
-                            "$ref": "#/definitions/IngressTlsProtocolExpression"
-                        }
-                    },
-                    "required": [
-                        "TlsExpression"
-                    ],
-                    "additionalProperties": false
-                },
-                {
-                    "type": "object",
-                    "title": "BooleanExpression",
-                    "properties": {
-                        "BooleanExpression": {
-                            "$ref": "#/definitions/IngressBooleanExpression"
-                        }
-                    },
-                    "required": [
-                        "BooleanExpression"
-                    ],
-                    "additionalProperties": false
-                }
-            ]
-        },
-        "PolicyStatement": {
-            "type": "object",
-            "properties": {
-                "Conditions": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/PolicyCondition"
-                    },
-                    "minItems": 1
-                },
-                "Action": {
-                    "$ref": "#/definitions/AcceptAction"
-                }
-            },
-            "required": [
-                "Action",
-                "Conditions"
-            ],
-            "additionalProperties": false
-        },
         "IngressAnalysis": {
             "type": "object",
             "properties": {
@@ -150,7 +74,9 @@
             "type": "string",
             "enum": [
                 "CIDR_IN",
-                "CIDR_NOT_IN"
+                "CIDR_MATCHES",
+                "CIDR_NOT_IN",
+                "NOT_CIDR_MATCHES"
             ]
         },
         "IngressIpToEvaluate": {
@@ -312,6 +238,82 @@
                     "additionalProperties": false
                 }
             ]
+        },
+        "PolicyCondition": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "title": "StringExpression",
+                    "properties": {
+                        "StringExpression": {
+                            "$ref": "#/definitions/IngressStringExpression"
+                        }
+                    },
+                    "required": [
+                        "StringExpression"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "title": "IpExpression",
+                    "properties": {
+                        "IpExpression": {
+                            "$ref": "#/definitions/IngressIpv4Expression"
+                        }
+                    },
+                    "required": [
+                        "IpExpression"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "title": "TlsExpression",
+                    "properties": {
+                        "TlsExpression": {
+                            "$ref": "#/definitions/IngressTlsProtocolExpression"
+                        }
+                    },
+                    "required": [
+                        "TlsExpression"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "title": "BooleanExpression",
+                    "properties": {
+                        "BooleanExpression": {
+                            "$ref": "#/definitions/IngressBooleanExpression"
+                        }
+                    },
+                    "required": [
+                        "BooleanExpression"
+                    ],
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "PolicyStatement": {
+            "type": "object",
+            "properties": {
+                "Conditions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PolicyCondition"
+                    },
+                    "minItems": 1
+                },
+                "Action": {
+                    "$ref": "#/definitions/AcceptAction"
+                }
+            },
+            "required": [
+                "Action",
+                "Conditions"
+            ],
+            "additionalProperties": false
         }
     },
     "tagging": {
@@ -323,6 +325,16 @@
     "properties": {
         "DefaultAction": {
             "$ref": "#/definitions/AcceptAction"
+        },
+        "MaxMessageSizeBytes": {
+            "type": "number",
+            "minimum": 1
+        },
+        "PolicyStatements": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/PolicyStatement"
+            }
         },
         "TrafficPolicyArn": {
             "type": "string"
@@ -337,21 +349,10 @@
             "maxLength": 63,
             "minLength": 3,
             "pattern": "^[A-Za-z0-9_\\-]+$"
-        },
-        "PolicyStatements": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/PolicyStatement"
-            }
-        },
-        "MaxMessageSizeBytes": {
-            "type": "number",
-            "minimum": 1
         }
     },
     "required": [
         "DefaultAction",
-        "TrafficPolicyName",
         "PolicyStatements"
     ],
     "readOnlyProperties": [
@@ -381,6 +382,7 @@
         },
         "delete": {
             "permissions": [
+                "ses:GetTrafficPolicy",
                 "ses:DeleteTrafficPolicy"
             ]
         },

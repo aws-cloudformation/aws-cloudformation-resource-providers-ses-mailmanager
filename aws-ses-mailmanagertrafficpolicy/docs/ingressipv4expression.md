@@ -39,7 +39,7 @@ _Required_: Yes
 
 _Type_: String
 
-_Allowed Values_: <code>CIDR_IN</code> | <code>CIDR_NOT_IN</code>
+_Allowed Values_: <code>CIDR_IN</code> | <code>CIDR_MATCHES</code> | <code>CIDR_NOT_IN</code> | <code>NOT_CIDR_MATCHES</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
