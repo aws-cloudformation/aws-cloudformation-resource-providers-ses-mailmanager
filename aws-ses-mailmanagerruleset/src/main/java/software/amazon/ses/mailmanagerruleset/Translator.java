@@ -1,8 +1,15 @@
 package software.amazon.ses.mailmanagerruleset;
 
-import com.google.common.collect.Lists;
 import software.amazon.awssdk.awscore.AwsRequest;
-import software.amazon.awssdk.awscore.AwsResponse;
+import software.amazon.awssdk.services.mailmanager.model.CreateRuleSetRequest;
+import software.amazon.awssdk.services.mailmanager.model.DeleteRuleSetRequest;
+import software.amazon.awssdk.services.mailmanager.model.GetRuleSetRequest;
+import software.amazon.awssdk.services.mailmanager.model.GetRuleSetResponse;
+import software.amazon.awssdk.services.mailmanager.model.ListRuleSetsRequest;
+import software.amazon.awssdk.services.mailmanager.model.ListRuleSetsResponse;
+import software.amazon.awssdk.services.mailmanager.model.UpdateRuleSetRequest;
+import software.amazon.ses.mailmanagerruleset.utils.RuleConvertorFromSdk;
+import software.amazon.ses.mailmanagerruleset.utils.RuleConvertorToSdk;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,118 +21,118 @@ import java.util.stream.Stream;
 
 /**
  * This class is a centralized placeholder for
- *  - api request construction
- *  - object translation to/from aws sdk
- *  - resource model construction for read/list handlers
+ * - api request construction
+ * - object translation to/from aws sdk
+ * - resource model construction for read/list handlers
  */
 
 public class Translator {
 
   /**
    * Request to create a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest translateToCreateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static CreateRuleSetRequest translateToCreateRequest(final ResourceModel model) {
+    return CreateRuleSetRequest.builder()
+            .ruleSetName(model.getRuleSetName())
+            .rules(RuleConvertorToSdk.ConvertToSdk(model.getRules()))
+            .description(model.getDescription())
+            .build();
   }
 
   /**
    * Request to read a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to describe a resource
    */
-  static AwsRequest translateToReadRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L20-L24
-    return awsRequest;
+  static GetRuleSetRequest translateToReadRequest(final ResourceModel model) {
+    return GetRuleSetRequest.builder()
+            .ruleSetId(model.getRuleSetId())
+            .build();
   }
 
   /**
-   * Translates resource object from sdk into a resource model
-   * @param awsResponse the aws service describe resource response
+   * Translates the resource object from sdk into a resource model
+   *
+   * @param response the aws service describe resource response
    * @return model resource model
    */
-  static ResourceModel translateFromReadResponse(final AwsResponse awsResponse) {
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L58-L73
+  static ResourceModel translateFromReadResponse(final GetRuleSetResponse response) {
     return ResourceModel.builder()
-        //.someProperty(response.property())
-        .build();
+            .ruleSetId(response.ruleSetId())
+            .ruleSetName(response.ruleSetName())
+            .ruleSetARN(response.ruleSetARN())
+            .rules(RuleConvertorFromSdk.ConvertFromSdk(response.rules()))
+            .description(response.description())
+            .build();
   }
 
   /**
    * Request to delete a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to delete a resource
    */
-  static AwsRequest translateToDeleteRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L33-L37
-    return awsRequest;
+  static DeleteRuleSetRequest translateToDeleteRequest(final ResourceModel model) {
+    return DeleteRuleSetRequest.builder()
+            .ruleSetId(model.getRuleSetId())
+            .build();
   }
 
   /**
-   * Request to update properties of a previously created resource
+   * Request to delete a resource
+   *
    * @param model resource model
-   * @return awsRequest the aws service request to modify a resource
+   * @return awsRequest the aws service request to delete a resource
    */
-  static AwsRequest translateToFirstUpdateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L45-L50
-    return awsRequest;
-  }
-
-  /**
-   * Request to update some other properties that could not be provisioned through first update request
-   * @param model resource model
-   * @return awsRequest the aws service request to modify a resource
-   */
-  static AwsRequest translateToSecondUpdateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    return awsRequest;
+  static UpdateRuleSetRequest translateToUpdateRequest(final ResourceModel model) {
+    return UpdateRuleSetRequest.builder()
+            .ruleSetId(model.getRuleSetId())
+            .ruleSetName(model.getRuleSetName())
+            .rules(RuleConvertorToSdk.ConvertToSdk(model.getRules()))
+            .description(model.getDescription())
+            .build();
   }
 
   /**
    * Request to list resources
+   *
    * @param nextToken token passed to the aws service list resources request
    * @return awsRequest the aws service request to list resources within aws account
    */
-  static AwsRequest translateToListRequest(final String nextToken) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L26-L31
-    return awsRequest;
+  static ListRuleSetsRequest translateToListRequest(final String nextToken) {
+    return ListRuleSetsRequest.builder()
+            .nextToken(nextToken)
+            .build();
   }
 
   /**
    * Translates resource objects from sdk into a resource model (primary identifier only)
-   * @param awsResponse the aws service describe resource response
+   *
+   * @param response the aws service describe resource response
    * @return list of resource models
    */
-  static List<ResourceModel> translateFromListRequest(final AwsResponse awsResponse) {
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L75-L82
-    return streamOfOrEmpty(Lists.newArrayList())
-        .map(resource -> ResourceModel.builder()
-            // include only primary identifier
-            .build())
-        .collect(Collectors.toList());
+  static List<ResourceModel> translateFromListResponse(final ListRuleSetsResponse response) {
+    return streamOfOrEmpty(response.ruleSets())
+            .map(resource -> ResourceModel.builder()
+                    // include only primary identifier
+                    .ruleSetId(resource.ruleSetId())
+                    .build())
+            .collect(Collectors.toList());
   }
 
   private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
     return Optional.ofNullable(collection)
-        .map(Collection::stream)
-        .orElseGet(Stream::empty);
+            .map(Collection::stream)
+            .orElseGet(Stream::empty);
   }
 
   /**
    * Request to add tags to a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
@@ -138,6 +145,7 @@ public class Translator {
 
   /**
    * Request to add tags to a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */

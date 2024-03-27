@@ -9,7 +9,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 {
     "<a href="#operator" title="Operator">Operator</a>" : <i>String</i>,
-    "<a href="#value" title="Value">Value</a>" : <i>[ String, ... ]</i>
+    "<a href="#values" title="Values">Values</a>" : <i>[ String, ... ]</i>
 }
 </pre>
 
@@ -17,7 +17,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 <a href="#operator" title="Operator">Operator</a>: <i>String</i>
-<a href="#value" title="Value">Value</a>: <i>
+<a href="#values" title="Values">Values</a>: <i>
       - String</i>
 </pre>
 
@@ -33,7 +33,7 @@ _Allowed Values_: <code>EQUALS</code> | <code>NOT_EQUALS</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
-#### Value
+#### Values
 
 _Required_: Yes
 

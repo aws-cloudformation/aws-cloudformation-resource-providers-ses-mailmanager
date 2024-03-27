@@ -46,4 +46,6 @@ _Minimum Length_: <code>20</code>
 
 _Maximum Length_: <code>2048</code>
 
+_Pattern_: <code>^arn:aws(|-cn|-us-gov):iam::\d{12}:role\/[a-zA-Z0-9_\-\.]{1,64}$</code>
+
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
