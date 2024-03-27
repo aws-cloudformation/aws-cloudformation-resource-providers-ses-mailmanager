@@ -11,7 +11,7 @@
                             "Attribute": "MAIL_FROM"
                         },
                         "Operator": "CONTAINS",
-                        "Value": [
+                        "Values": [
                             "@amazon.com"
                         ]
                     }
@@ -24,7 +24,7 @@
                             "Attribute": "MAIL_FROM"
                         },
                         "Operator": "CONTAINS",
-                        "Value": [
+                        "Values": [
                             "@badsender.com"
                         ]
                     }
