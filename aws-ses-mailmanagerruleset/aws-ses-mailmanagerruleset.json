@@ -71,7 +71,8 @@
                 "RoleArn": {
                     "type": "string",
                     "maxLength": 2048,
-                    "minLength": 20
+                    "minLength": 20,
+                    "pattern": "^arn:aws(|-cn|-us-gov):iam::\\d{12}:role\\/[a-zA-Z0-9_\\-\\.]{1,64}$"
                 }
             },
             "required": [
@@ -423,7 +424,7 @@
                 "Operator": {
                     "$ref": "#/definitions/RuleDmarcOperator"
                 },
-                "Value": {
+                "Values": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/RuleDmarcPolicy"
@@ -434,7 +435,7 @@
             },
             "required": [
                 "Operator",
-                "Value"
+                "Values"
             ],
             "additionalProperties": false
         },
@@ -468,7 +469,7 @@
                 "Operator": {
                     "$ref": "#/definitions/RuleIpOperator"
                 },
-                "Value": {
+                "Values": {
                     "type": "array",
                     "items": {
                         "type": "string",
@@ -483,7 +484,7 @@
             "required": [
                 "Evaluate",
                 "Operator",
-                "Value"
+                "Values"
             ],
             "additionalProperties": false
         },
@@ -613,7 +614,7 @@
                 "Operator": {
                     "$ref": "#/definitions/RuleStringOperator"
                 },
-                "Value": {
+                "Values": {
                     "type": "array",
                     "items": {
                         "type": "string",
@@ -627,7 +628,7 @@
             "required": [
                 "Evaluate",
                 "Operator",
-                "Value"
+                "Values"
             ],
             "additionalProperties": false
         },
@@ -683,7 +684,7 @@
                 "Operator": {
                     "$ref": "#/definitions/RuleVerdictOperator"
                 },
-                "Value": {
+                "Values": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/RuleVerdict"
@@ -695,7 +696,7 @@
             "required": [
                 "Evaluate",
                 "Operator",
-                "Value"
+                "Values"
             ],
             "additionalProperties": false
         },
@@ -739,6 +740,11 @@
         "S3Action": {
             "type": "object",
             "properties": {
+                "RoleArn": {
+                    "type": "string",
+                    "maxLength": 2048,
+                    "minLength": 20
+                },
                 "S3Bucket": {
                     "type": "string",
                     "maxLength": 62,
@@ -783,12 +789,14 @@
                 "Key": {
                     "type": "string",
                     "maxLength": 128,
-                    "minLength": 1
+                    "minLength": 1,
+                    "pattern": "^[a-zA-Z0-9/_\\+=\\.:@\\-]+$"
                 },
                 "Value": {
                     "type": "string",
                     "maxLength": 256,
-                    "minLength": 0
+                    "minLength": 0,
+                    "pattern": "^[a-zA-Z0-9/_\\+=\\.:@\\-]*$"
                 }
             },
             "required": [
@@ -837,12 +845,13 @@
             "type": "array",
             "items": {
                 "$ref": "#/definitions/Tag"
-            }
+            },
+            "maxItems": 200,
+            "minItems": 0
         }
     },
     "required": [
         "Description",
-        "RuleSetName",
         "Rules"
     ],
     "readOnlyProperties": [
@@ -878,6 +887,7 @@
         },
         "delete": {
             "permissions": [
+                "ses:GetRuleSet",
                 "ses:DeleteRuleSet"
             ]
         },
