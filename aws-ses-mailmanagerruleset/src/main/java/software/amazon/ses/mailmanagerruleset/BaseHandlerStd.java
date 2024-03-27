@@ -1,6 +1,6 @@
 package software.amazon.ses.mailmanagerruleset;
 
-iimport software.amazon.awssdk.awscore.exception.AwsServiceException;
+import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.ConflictException;
 import software.amazon.awssdk.services.mailmanager.model.ResourceNotFoundException;
