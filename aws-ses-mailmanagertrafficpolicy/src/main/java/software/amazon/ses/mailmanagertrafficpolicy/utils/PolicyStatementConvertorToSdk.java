@@ -84,7 +84,7 @@ public class PolicyStatementConvertorToSdk {
             return null;
         }
         return software.amazon.awssdk.services.mailmanager.model.IngressIpv4Expression.builder()
-                .value(source.getValue())
+                .values(source.getValues())
                 .operator(source.getOperator())
                 .evaluate(ConvertToSdk(source.getEvaluate()))
                 .build();
@@ -124,7 +124,7 @@ public class PolicyStatementConvertorToSdk {
             return null;
         }
         return software.amazon.awssdk.services.mailmanager.model.IngressStringExpression.builder()
-                .value(source.getValue())
+                .values(source.getValues())
                 .operator(source.getOperator())
                 .evaluate(ConvertToSdk(source.getEvaluate()))
                 .build();
