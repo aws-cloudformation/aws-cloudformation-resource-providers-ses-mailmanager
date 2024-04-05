@@ -17,6 +17,19 @@
                         "PasswordAuthentication"
                     ],
                     "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "title": "SecretArn",
+                    "properties": {
+                        "SecretArn": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "SecretArn"
+                    ],
+                    "additionalProperties": false
                 }
             ]
         },
@@ -48,12 +61,14 @@
                 "Key": {
                     "type": "string",
                     "maxLength": 128,
-                    "minLength": 1
+                    "minLength": 1,
+                    "pattern": "^[a-zA-Z0-9/_\\+=\\.:@\\-]+$"
                 },
                 "Value": {
                     "type": "string",
                     "maxLength": 256,
-                    "minLength": 0
+                    "minLength": 0,
+                    "pattern": "^[a-zA-Z0-9/_\\+=\\.:@\\-]*$"
                 }
             },
             "required": [
@@ -103,12 +118,13 @@
             "type": "array",
             "items": {
                 "$ref": "#/definitions/Tag"
-            }
+            },
+            "maxItems": 200,
+            "minItems": 0
         }
     },
     "required": [
         "Authentication",
-        "RelayName",
         "ServerName",
         "ServerPort"
     ],
@@ -116,11 +132,11 @@
         "/properties/RelayARN",
         "/properties/RelayId"
     ],
-    "writeOnlyProperties": [
-        "/properties/Tags",
-        "/properties/Authentication"
-    ],
     "createOnlyProperties": [
+        "/properties/Tags"
+    ],
+    "writeOnlyProperties": [
+        "/properties/Authentication",
         "/properties/Tags"
     ],
     "primaryIdentifier": [
@@ -146,6 +162,7 @@
         },
         "delete": {
             "permissions": [
+                "ses:GetRelay",
                 "ses:DeleteRelay"
             ]
         },

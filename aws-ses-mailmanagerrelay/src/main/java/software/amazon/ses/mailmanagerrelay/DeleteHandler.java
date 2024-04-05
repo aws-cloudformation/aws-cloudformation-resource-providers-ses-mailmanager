@@ -1,12 +1,10 @@
 package software.amazon.ses.mailmanagerrelay;
 
-// TODO: replace all usage of SdkClient with your service client type, e.g; YourServiceAsyncClient
-// import software.amazon.awssdk.services.yourservice.YourServiceAsyncClient;
 
-import software.amazon.awssdk.awscore.AwsResponse;
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
-import software.amazon.awssdk.core.SdkClient;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
+import software.amazon.awssdk.services.mailmanager.MailManagerClient;
+import software.amazon.awssdk.services.mailmanager.model.DeleteRelayRequest;
+import software.amazon.awssdk.services.mailmanager.model.DeleteRelayResponse;
+import software.amazon.awssdk.services.mailmanager.model.GetRelayRequest;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -20,95 +18,43 @@ public class DeleteHandler extends BaseHandlerStd {
         final AmazonWebServicesClientProxy proxy,
         final ResourceHandlerRequest<ResourceModel> request,
         final CallbackContext callbackContext,
-        final ProxyClient<SdkClient> proxyClient,
+        final ProxyClient<MailManagerClient> proxyClient,
         final Logger logger) {
 
         this.logger = logger;
 
-        // TODO: Adjust Progress Chain according to your implementation
-        // https://github.com/aws-cloudformation/cloudformation-cli-java-plugin/blob/master/src/main/java/software/amazon/cloudformation/proxy/CallChain.java
+        final ResourceModel model = request.getDesiredResourceState();
+        final String clientRequestToken = request.getClientRequestToken();
+
+        logger.log(String.format("[ClientRequestToken: %s] Trying to delete Relay ID %s", clientRequestToken, model.getRelayId()));
 
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
+                .then(progress ->
+                        proxy.initiate("AWS-SES-MailManagerRelay::Delete", proxyClient, model, callbackContext)
+                                .translateToServiceRequest(Translator::translateToDeleteRequest)
+                                .makeServiceCall((deleteRelayRequest, _proxyClient) -> deleteResource(deleteRelayRequest, _proxyClient, clientRequestToken))
+                                .handleError((deleteRelayRequest, _exception, _proxyClient, _resourceModel, _callbackContext) ->
+                                        handleError(_exception, _resourceModel, _callbackContext, logger, clientRequestToken))
+                                .progress()
+                )
+                .then(progress -> ProgressEvent.defaultSuccessHandler(null));
+    }
 
-            // STEP 1 [check if resource already exists]
-            // for more information -> https://docs.aws.amazon.com/cloudformation-cli/latest/userguide/resource-type-test-contract.html
-            // if target API does not support 'ResourceNotFoundException' then following check is required
-            .then(progress ->
-                // STEP 1.0 [initialize a proxy context]
-                // If your service API does not return ResourceNotFoundException on delete requests against some identifier (e.g; resource Name)
-                // and instead returns a 200 even though a resource already deleted, you must first check if the resource exists here
-                // NOTE: If your service API throws 'ResourceNotFoundException' for delete requests this method is not necessary
-                proxy.initiate("AWS-SES-MailManagerRelay::Delete::PreDeletionCheck", proxyClient, progress.getResourceModel(), progress.getCallbackContext())
+    private DeleteRelayResponse deleteResource(
+            final DeleteRelayRequest deleteRelayRequest,
+            final ProxyClient<MailManagerClient> proxyClient,
+            final String clientRequestToken
+    ) {
+        logger.log(String.format("[ClientRequestToken: %s] Relay ID <%s> is deleting.", clientRequestToken, deleteRelayRequest.relayId()));
 
-                    // STEP 1.1 [initialize a proxy context]
-                    .translateToServiceRequest(Translator::translateToReadRequest)
+        GetRelayRequest request = GetRelayRequest.builder()
+                .relayId(deleteRelayRequest.relayId())
+                .build();
 
-                    // STEP 1.2 [TODO: make an api call]
-                    .makeServiceCall((awsRequest, client) -> {
-                        AwsResponse awsResponse = null;
+        // Need to check if resource exists before deleting due to idempotent deletion.
+        proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::getRelay);
 
-                        // TODO: add custom read resource logic
+        return proxyClient.injectCredentialsAndInvokeV2(deleteRelayRequest, proxyClient.client()::deleteRelay);
 
-                        logger.log(String.format("%s has successfully been read.", ResourceModel.TYPE_NAME));
-                        return awsResponse;
-                    })
-
-                    // STEP 1.3 [TODO: handle exception]
-                    .handleError((awsRequest, exception, client, model, context) -> {
-                        // TODO: uncomment when ready to implement
-                        // if (exception instanceof ResourceNotFoundException)
-                        //     return ProgressEvent.success(model, context);
-                        // throw exception;
-                        return ProgressEvent.progress(model, context);
-                    })
-                    .progress()
-            )
-
-            // STEP 2.0 [delete/stabilize progress chain - required for resource deletion]
-            .then(progress ->
-                // If your service API throws 'ResourceNotFoundException' for delete requests then DeleteHandler can return just proxy.initiate construction
-                // STEP 2.0 [initialize a proxy context]
-                // Implement client invocation of the delete request through the proxyClient, which is already initialised with
-                // caller credentials, correct region and retry settings
-                proxy.initiate("AWS-SES-MailManagerRelay::Delete", proxyClient, progress.getResourceModel(), progress.getCallbackContext())
-
-                    // STEP 2.1 [TODO: construct a body of a request]
-                    .translateToServiceRequest(Translator::translateToDeleteRequest)
-
-                    // STEP 2.2 [TODO: make an api call]
-                    .makeServiceCall((awsRequest, client) -> {
-                        AwsResponse awsResponse = null;
-                        try {
-
-                            // TODO: put your delete resource code here
-
-                        } catch (final AwsServiceException e) {
-                            /*
-                            * While the handler contract states that the handler must always return a progress event,
-                            * you may throw any instance of BaseHandlerException, as the wrapper map it to a progress event.
-                            * Each BaseHandlerException maps to a specific error code, and you should map service exceptions as closely as possible
-                            * to more specific error codes
-                            */
-                            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
-                        }
-
-                        logger.log(String.format("%s successfully deleted.", ResourceModel.TYPE_NAME));
-                        return awsResponse;
-                    })
-
-                    // STEP 2.3 [TODO: stabilize step is not necessarily required but typically involves describing the resource until it is in a certain status, though it can take many forms]
-                    // for more information -> https://docs.aws.amazon.com/cloudformation-cli/latest/userguide/resource-type-test-contract.html
-                    .stabilize((awsRequest, awsResponse, client, model, context) -> {
-                        // TODO: put your stabilization code here
-
-                        final boolean stabilized = true;
-                        logger.log(String.format("%s [%s] deletion has stabilized: %s", ResourceModel.TYPE_NAME, model.getPrimaryIdentifier(), stabilized));
-                        return stabilized;
-                    })
-                    .progress()
-            )
-
-            // STEP 3 [TODO: return the successful progress event without resource model]
-            .then(progress -> ProgressEvent.defaultSuccessHandler(null));
     }
 }
