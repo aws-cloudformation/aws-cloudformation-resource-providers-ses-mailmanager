@@ -85,7 +85,7 @@ public class PolicyStatementConvertorFromSdk {
             return null;
         }
         return IngressIpv4Expression.builder()
-                .value(source.value())
+                .values(source.values())
                 .operator(source.operatorAsString())
                 .evaluate(ConvertFromSdk(source.evaluate()))
                 .build();
@@ -125,7 +125,7 @@ public class PolicyStatementConvertorFromSdk {
             return null;
         }
         return IngressStringExpression.builder()
-                .value(source.value())
+                .values(source.values())
                 .operator(source.operatorAsString())
                 .evaluate(ConvertFromSdk(source.evaluate()))
                 .build();

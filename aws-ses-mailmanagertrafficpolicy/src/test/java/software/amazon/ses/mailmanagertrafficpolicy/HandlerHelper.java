@@ -43,7 +43,7 @@ public class HandlerHelper {
                 .stringExpression(
                         IngressStringExpression.builder()
                                 .evaluate(IngressStringToEvaluate.fromAttribute(IngressStringEmailAttribute.RECIPIENT))
-                                .value("zlinzhou@amazon.com")
+                                .values("zlinzhou@amazon.com")
                                 .operator(IngressStringOperator.EQUALS)
                                 .build()
                 )

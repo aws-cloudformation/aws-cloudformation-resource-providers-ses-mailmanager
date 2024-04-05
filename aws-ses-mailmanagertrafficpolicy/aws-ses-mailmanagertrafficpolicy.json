@@ -111,7 +111,7 @@
                 "Operator": {
                     "$ref": "#/definitions/IngressIpOperator"
                 },
-                "Value": {
+                "Values": {
                     "type": "array",
                     "items": {
                         "type": "string",
@@ -122,7 +122,7 @@
             "required": [
                 "Evaluate",
                 "Operator",
-                "Value"
+                "Values"
             ],
             "additionalProperties": false
         },
@@ -141,7 +141,7 @@
                 "Operator": {
                     "$ref": "#/definitions/IngressStringOperator"
                 },
-                "Value": {
+                "Values": {
                     "type": "array",
                     "items": {
                         "type": "string"
@@ -151,7 +151,7 @@
             "required": [
                 "Evaluate",
                 "Operator",
-                "Value"
+                "Values"
             ],
             "additionalProperties": false
         },
