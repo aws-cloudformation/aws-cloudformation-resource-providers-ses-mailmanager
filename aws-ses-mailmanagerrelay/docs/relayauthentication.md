@@ -8,7 +8,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "<a href="#passwordauthentication" title="PasswordAuthentication">PasswordAuthentication</a>" : <i><a href="relaypasswordauthentication.md">RelayPasswordAuthentication</a></i>
+    "<a href="#passwordauthentication" title="PasswordAuthentication">PasswordAuthentication</a>" : <i><a href="relaypasswordauthentication.md">RelayPasswordAuthentication</a></i>,
+    "<a href="#secretarn" title="SecretArn">SecretArn</a>" : <i>String</i>
 }
 </pre>
 
@@ -16,6 +17,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 <a href="#passwordauthentication" title="PasswordAuthentication">PasswordAuthentication</a>: <i><a href="relaypasswordauthentication.md">RelayPasswordAuthentication</a></i>
+<a href="#secretarn" title="SecretArn">SecretArn</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -25,5 +27,13 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 _Required_: Yes
 
 _Type_: <a href="relaypasswordauthentication.md">RelayPasswordAuthentication</a>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### SecretArn
+
+_Required_: Yes
+
+_Type_: String
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
