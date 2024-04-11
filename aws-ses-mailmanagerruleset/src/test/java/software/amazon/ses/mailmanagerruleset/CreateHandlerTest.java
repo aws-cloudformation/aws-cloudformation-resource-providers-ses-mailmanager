@@ -143,13 +143,14 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .clientRequestToken(CLIENT_REQUEST_TOKEN)
                 .build();
 
-        when(mailManagerClient.createRuleSet(any(CreateRuleSetRequest.class))).thenThrow(ConflictException.builder().build());
+        when(mailManagerClient.createRuleSet(any(CreateRuleSetRequest.class))).thenThrow(ConflictException.builder().message("RuleSet already exists").build());
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
-        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.AlreadyExists);
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.ResourceConflict);
+        assertThat(response.getMessage()).isEqualTo("RuleSet already exists");
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModels()).isNull();
     }

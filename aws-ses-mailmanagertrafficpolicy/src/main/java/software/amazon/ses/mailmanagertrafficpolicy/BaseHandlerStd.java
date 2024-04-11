@@ -21,7 +21,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
   private final Map<Class<? extends Exception>, HandlerErrorCode> exceptionMap = Map.of(
           IllegalArgumentException.class, HandlerErrorCode.InvalidRequest,
           ValidationException.class, HandlerErrorCode.InvalidRequest,
-          ConflictException.class, HandlerErrorCode.AlreadyExists,
+          ConflictException.class, HandlerErrorCode.ResourceConflict,
           ResourceNotFoundException.class, HandlerErrorCode.NotFound,
           ServiceQuotaExceededException.class, HandlerErrorCode.ServiceLimitExceeded,
           AwsServiceException.class, HandlerErrorCode.GeneralServiceException
