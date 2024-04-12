@@ -1,0 +1,8 @@
+{
+    "ArchiveName": "archive_new_name",
+    "KmsKeyArn": "kms_key_arn",
+    "MessageRetentionPeriodDays": 20.0,
+    "Retention": {
+        "RetentionPeriod": "THREE_MONTHS"
+    }
+}
