@@ -5,6 +5,7 @@ import java.time.Duration;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.AcceptAction;
 import software.amazon.awssdk.services.mailmanager.model.GetTrafficPolicyRequest;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
@@ -30,6 +31,7 @@ import static software.amazon.ses.mailmanagertrafficpolicy.HandlerHelper.CLIENT_
 import static software.amazon.ses.mailmanagertrafficpolicy.HandlerHelper.TRAFFIC_POLICY_ID;
 import static software.amazon.ses.mailmanagertrafficpolicy.HandlerHelper.TRAFFIC_POLICY_NAME;
 import static software.amazon.ses.mailmanagertrafficpolicy.HandlerHelper.fakeGetTrafficPolicyResponse;
+import static software.amazon.ses.mailmanagertrafficpolicy.HandlerHelper.fakeListTagsForResourceResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadHandlerTest extends AbstractTestBase {
@@ -68,6 +70,7 @@ public class ReadHandlerTest extends AbstractTestBase {
                 .build();
 
         when(mailManagerClient.getTrafficPolicy(any(GetTrafficPolicyRequest.class))).thenReturn(fakeGetTrafficPolicyResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
@@ -78,6 +81,8 @@ public class ReadHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModel().getPolicyStatements()).isNotNull();
         assertThat(response.getResourceModel().getPolicyStatements().size()).isEqualTo(2);
         assertThat(response.getResourceModel().getDefaultAction()).isEqualTo(AcceptAction.ALLOW.toString());
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();

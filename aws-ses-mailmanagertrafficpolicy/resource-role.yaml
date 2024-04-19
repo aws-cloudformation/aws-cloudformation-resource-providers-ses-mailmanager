@@ -33,7 +33,10 @@ Resources:
                 - "ses:CreateTrafficPolicy"
                 - "ses:DeleteTrafficPolicy"
                 - "ses:GetTrafficPolicy"
+                - "ses:ListTagsForResource"
                 - "ses:ListTrafficPolicies"
+                - "ses:TagResource"
+                - "ses:UntagResource"
                 - "ses:UpdateTrafficPolicy"
                 Resource: "*"
 Outputs:
