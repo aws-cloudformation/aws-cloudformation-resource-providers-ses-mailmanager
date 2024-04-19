@@ -103,7 +103,7 @@ public class DeleteHandlerTest extends AbstractTestBase {
                 .clientRequestToken(HandlerHelper.CLIENT_REQUEST_TOKEN)
                 .build();
 
-        when(mailManagerClient.deleteIngressPoint(any(DeleteIngressPointRequest.class))).thenThrow(ResourceNotFoundException.builder().message("resource not found").build());
+        when(mailManagerClient.getIngressPoint(any(GetIngressPointRequest.class))).thenThrow(ResourceNotFoundException.builder().message("resource not found").build());
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 

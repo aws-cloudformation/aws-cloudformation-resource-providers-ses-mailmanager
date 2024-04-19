@@ -3,6 +3,8 @@ package software.amazon.ses.mailmanageringresspoint;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.DeleteIngressPointRequest;
 import software.amazon.awssdk.services.mailmanager.model.DeleteIngressPointResponse;
+import software.amazon.awssdk.services.mailmanager.model.GetIngressPointRequest;
+import software.amazon.awssdk.services.mailmanager.model.GetIngressPointResponse;
 import software.amazon.awssdk.services.mailmanager.model.IngressPointStatus;
 import software.amazon.awssdk.services.mailmanager.model.ResourceNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
@@ -34,10 +36,12 @@ public class DeleteHandler extends BaseHandlerStd {
                         proxy.initiate("AWS-SES-MailManagerIngressPoint::Delete", proxyClient, model, callbackContext)
                                 .translateToServiceRequest(Translator::translateToDeleteRequest)
                                 .backoffDelay(STABILIZATION_DELAY_DELETE)
-                                .makeServiceCall((deleteIngressPointRequest, _proxyClient) -> deleteResource(deleteIngressPointRequest, _proxyClient, clientRequestToken))
-                                .stabilize((deleteIngressPointRequest, deleteIngressPointResponse, _proxyClient, _resourceModel, _context) -> stabilizedOnDelete(_proxyClient, _resourceModel))
-                                .handleError((deleteIngressPointRequest, _exception, _proxyClient, _resourceModel, _callbackContext) ->
-                                        handleError(_exception, _resourceModel, _callbackContext, logger, clientRequestToken))
+                                .makeServiceCall((deleteIngressPointRequest, _proxyClient)
+                                        -> deleteResource(deleteIngressPointRequest, _proxyClient, clientRequestToken))
+                                .stabilize((deleteIngressPointRequest, deleteIngressPointResponse, _proxyClient, _resourceModel, _context)
+                                        -> stabilizedOnDelete(_proxyClient, _resourceModel))
+                                .handleError((deleteIngressPointRequest, _exception, _proxyClient, _resourceModel, _callbackContext)
+                                        -> handleError(_exception, _resourceModel, _callbackContext, logger, clientRequestToken))
                                 .progress()
                 )
                 .then(progress -> ProgressEvent.defaultSuccessHandler(null));
@@ -48,6 +52,14 @@ public class DeleteHandler extends BaseHandlerStd {
             final ProxyClient<MailManagerClient> proxyClient,
             final String clientRequestToken
     ) {
+
+        GetIngressPointRequest request = GetIngressPointRequest.builder()
+                .ingressPointId(deleteIngressPointRequest.ingressPointId())
+                .build();
+
+        // Need to check if resource exists before deleting due to idempotent deletion.
+        GetIngressPointResponse response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::getIngressPoint);
+
         logger.log(String.format("[ClientRequestToken: %s] IngressPoint ID %s is deleting.", clientRequestToken, deleteIngressPointRequest.ingressPointId()));
         return proxyClient.injectCredentialsAndInvokeV2(deleteIngressPointRequest, proxyClient.client()::deleteIngressPoint);
     }
