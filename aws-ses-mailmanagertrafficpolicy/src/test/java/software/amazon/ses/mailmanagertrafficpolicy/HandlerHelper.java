@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.mailmanager.model.IngressStringEmailAttri
 import software.amazon.awssdk.services.mailmanager.model.IngressStringExpression;
 import software.amazon.awssdk.services.mailmanager.model.IngressStringOperator;
 import software.amazon.awssdk.services.mailmanager.model.IngressStringToEvaluate;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceResponse;
 import software.amazon.awssdk.services.mailmanager.model.ListTrafficPoliciesResponse;
 import software.amazon.awssdk.services.mailmanager.model.PolicyCondition;
 import software.amazon.awssdk.services.mailmanager.model.PolicyStatement;
@@ -26,8 +27,8 @@ public class HandlerHelper {
     public static final String TRAFFIC_POLICY_ARN = "traffic_policy_arn";
     public static final String CLIENT_REQUEST_TOKEN = "client_request_token";
     public static final String LOGICAL_RESOURCE_ID = "logical_resource_id";
-    static GetTrafficPolicyResponse fakeGetTrafficPolicyResponse() {
 
+    static GetTrafficPolicyResponse fakeGetTrafficPolicyResponse() {
         return GetTrafficPolicyResponse.builder()
                 .trafficPolicyId(TRAFFIC_POLICY_ID)
                 .trafficPolicyArn(TRAFFIC_POLICY_ARN)
@@ -35,6 +36,21 @@ public class HandlerHelper {
                 .policyStatements(generatePolicyStatements())
                 .defaultAction(AcceptAction.ALLOW)
                 .maxMessageSizeBytes(100)
+                .build();
+    }
+
+    static ListTagsForResourceResponse fakeListTagsForResourceResponse() {
+        return ListTagsForResourceResponse.builder()
+                .tags(
+                        software.amazon.awssdk.services.mailmanager.model.Tag.builder()
+                                .key("keyOne")
+                                .value("valueOne")
+                                .build(),
+                        software.amazon.awssdk.services.mailmanager.model.Tag.builder()
+                                .key("keyTwo")
+                                .value("valueTwo")
+                                .build()
+                )
                 .build();
     }
 

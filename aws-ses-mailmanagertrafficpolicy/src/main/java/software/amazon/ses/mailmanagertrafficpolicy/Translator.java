@@ -1,12 +1,14 @@
 package software.amazon.ses.mailmanagertrafficpolicy;
 
-import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.services.mailmanager.model.CreateTrafficPolicyRequest;
 import software.amazon.awssdk.services.mailmanager.model.DeleteTrafficPolicyRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetTrafficPolicyRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetTrafficPolicyResponse;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.ListTrafficPoliciesRequest;
 import software.amazon.awssdk.services.mailmanager.model.ListTrafficPoliciesResponse;
+import software.amazon.awssdk.services.mailmanager.model.TagResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.UntagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UpdateTrafficPolicyRequest;
 import software.amazon.ses.mailmanagertrafficpolicy.utils.PolicyStatementConvertorFromSdk;
 import software.amazon.ses.mailmanagertrafficpolicy.utils.PolicyStatementConvertorToSdk;
@@ -18,6 +20,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static software.amazon.ses.mailmanagertrafficpolicy.TagHelper.convertToSet;
+import static software.amazon.ses.mailmanagertrafficpolicy.utils.TagsConvertor.convertToSdk;
 
 
 public class Translator {
@@ -34,6 +39,7 @@ public class Translator {
             .policyStatements(PolicyStatementConvertorToSdk.ConvertToSdk(model.getPolicyStatements()))
             .maxMessageSizeBytes(model.getMaxMessageSizeBytes() == null ? null : model.getMaxMessageSizeBytes().intValue())
             .defaultAction(model.getDefaultAction())
+            .tags(convertToSdk(model.getTags()))
             .build();
   }
 
@@ -107,6 +113,18 @@ public class Translator {
   }
 
   /**
+   * Request the list of resource's tags
+   *
+   * @param model resource model
+   * @return awsRequest the aws service request to list resources within aws account
+   */
+  static ListTagsForResourceRequest translateToListTagsForResourceRequest(final ResourceModel model) {
+    return ListTagsForResourceRequest.builder()
+            .resourceArn(model.getTrafficPolicyArn())
+            .build();
+  }
+
+  /**
    * Translates resource objects from sdk into a resource model (primary identifier only)
    *
    * @param response the aws service describe resource response
@@ -133,11 +151,11 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static TagResourceRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
+    return TagResourceRequest.builder()
+            .resourceArn(model.getTrafficPolicyArn())
+            .tags(convertToSet(addedTags))
+            .build();
   }
 
   /**
@@ -146,10 +164,10 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static UntagResourceRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
+    return UntagResourceRequest.builder()
+            .resourceArn(model.getTrafficPolicyArn())
+            .tagKeys(removedTags)
+            .build();
   }
 }

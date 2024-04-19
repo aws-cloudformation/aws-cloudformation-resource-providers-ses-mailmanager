@@ -15,6 +15,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#defaultaction" title="DefaultAction">DefaultAction</a>" : <i>String</i>,
         "<a href="#maxmessagesizebytes" title="MaxMessageSizeBytes">MaxMessageSizeBytes</a>" : <i>Double</i>,
         "<a href="#policystatements" title="PolicyStatements">PolicyStatements</a>" : <i>[ <a href="policystatement.md">PolicyStatement</a>, ... ]</i>,
+        "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>,
         "<a href="#trafficpolicyname" title="TrafficPolicyName">TrafficPolicyName</a>" : <i>String</i>
     }
 }
@@ -29,6 +30,8 @@ Properties:
     <a href="#maxmessagesizebytes" title="MaxMessageSizeBytes">MaxMessageSizeBytes</a>: <i>Double</i>
     <a href="#policystatements" title="PolicyStatements">PolicyStatements</a>: <i>
       - <a href="policystatement.md">PolicyStatement</a></i>
+    <a href="#tags" title="Tags">Tags</a>: <i>
+      - <a href="tag.md">Tag</a></i>
     <a href="#trafficpolicyname" title="TrafficPolicyName">TrafficPolicyName</a>: <i>String</i>
 </pre>
 
@@ -57,6 +60,14 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 _Required_: Yes
 
 _Type_: List of <a href="policystatement.md">PolicyStatement</a>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### Tags
+
+_Required_: No
+
+_Type_: List of <a href="tag.md">Tag</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

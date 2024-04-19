@@ -26,10 +26,10 @@ public class ListHandler extends BaseHandlerStd {
 
         return proxy.initiate("AWS-SES-MailManagerTrafficPolicy::List", proxyClient, model, callbackContext)
                 .translateToServiceRequest(_resourceModel -> Translator.translateToListRequest(request.getNextToken()))
-                .makeServiceCall((listTrafficPolicyRequest, _proxyClient) ->
-                        _proxyClient.injectCredentialsAndInvokeV2(listTrafficPolicyRequest, _proxyClient.client()::listTrafficPolicies))
-                .handleError((listTrafficPolicyRequest, _exception, _proxyClient, _resourceModel, _callbackContext) ->
-                        handleError(_exception, _resourceModel, _callbackContext, logger, clientRequestToken))
+                .makeServiceCall((listTrafficPolicyRequest, _proxyClient)
+                        -> _proxyClient.injectCredentialsAndInvokeV2(listTrafficPolicyRequest, _proxyClient.client()::listTrafficPolicies))
+                .handleError((listTrafficPolicyRequest, _exception, _proxyClient, _resourceModel, _callbackContext)
+                        -> handleError(_exception, _resourceModel, _callbackContext, logger, clientRequestToken))
                 .done((listTrafficPolicyRequest, listTrafficPolicyResponse, _proxyClient, _resourceModel, _callbackContext) ->
                         ProgressEvent.<ResourceModel, CallbackContext>builder()
                                 .resourceModels(Translator.translateFromListResponse(listTrafficPolicyResponse))

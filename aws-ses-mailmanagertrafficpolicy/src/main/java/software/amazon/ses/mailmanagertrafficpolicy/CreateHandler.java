@@ -39,17 +39,19 @@ public class CreateHandler extends BaseHandlerStd {
         logger.log(String.format("[ClientRequestToken: %s] Trying to create TrafficPolicy name %s", clientRequestToken, model.getTrafficPolicyName()));
 
         return ProgressEvent.progress(model, callbackContext)
-                .then(progress ->
-                        proxy.initiate("AWS-SES-MailManagerTrafficPolicy::Create", proxyClient, model, callbackContext)
-                                .translateToServiceRequest(Translator::translateToCreateRequest)
-                                .makeServiceCall(
-                                        (createTrafficPolicyRequest, _proxyClient)
+                .then(
+                        progress ->
+                                proxy.initiate("AWS-SES-MailManagerTrafficPolicy::Create", proxyClient, model, callbackContext)
+                                        .translateToServiceRequest(Translator::translateToCreateRequest)
+                                        .makeServiceCall((createTrafficPolicyRequest, _proxyClient)
                                                 -> createResource(createTrafficPolicyRequest, _proxyClient, model, clientRequestToken))
-                                .handleError((createTrafficPolicyRequest, exception, _proxyClient, _resourceModel, _callbackContext) ->
-                                        handleError(exception, _resourceModel, _callbackContext, logger, clientRequestToken))
-                                .progress()
+                                        .handleError((createTrafficPolicyRequest, exception, _proxyClient, _resourceModel, _callbackContext)
+                                                -> handleError(exception, _resourceModel, _callbackContext, logger, clientRequestToken))
+                                        .progress()
                 )
-                .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+                .then(
+                        progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger)
+                );
     }
 
     private CreateTrafficPolicyResponse createResource(

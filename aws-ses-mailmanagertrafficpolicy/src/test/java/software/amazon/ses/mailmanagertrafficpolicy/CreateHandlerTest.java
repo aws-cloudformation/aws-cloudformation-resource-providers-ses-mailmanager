@@ -7,6 +7,7 @@ import software.amazon.awssdk.services.mailmanager.model.AcceptAction;
 import software.amazon.awssdk.services.mailmanager.model.ConflictException;
 import software.amazon.awssdk.services.mailmanager.model.CreateTrafficPolicyRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetTrafficPolicyRequest;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.ValidationException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
@@ -35,6 +36,7 @@ import static software.amazon.ses.mailmanagertrafficpolicy.HandlerHelper.TRAFFIC
 import static software.amazon.ses.mailmanagertrafficpolicy.HandlerHelper.TRAFFIC_POLICY_NAME;
 import static software.amazon.ses.mailmanagertrafficpolicy.HandlerHelper.fakeCreateTrafficPolicyResponse;
 import static software.amazon.ses.mailmanagertrafficpolicy.HandlerHelper.fakeGetTrafficPolicyResponse;
+import static software.amazon.ses.mailmanagertrafficpolicy.HandlerHelper.fakeListTagsForResourceResponse;
 import static software.amazon.ses.mailmanagertrafficpolicy.HandlerHelper.generatePolicyStatements;
 import static software.amazon.ses.mailmanagertrafficpolicy.utils.PolicyStatementConvertorFromSdk.ConvertFromSdk;
 
@@ -78,6 +80,7 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         when(mailManagerClient.createTrafficPolicy(any(CreateTrafficPolicyRequest.class))).thenReturn(fakeCreateTrafficPolicyResponse());
         when(mailManagerClient.getTrafficPolicy(any(GetTrafficPolicyRequest.class))).thenReturn(fakeGetTrafficPolicyResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -93,6 +96,8 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModel().getPolicyStatements().get(0).getConditions().size()).isEqualTo(1);
         assertThat(response.getResourceModel().getPolicyStatements().get(1).getConditions().size()).isEqualTo(1);
         assertThat(response.getResourceModel().getDefaultAction()).isEqualTo(AcceptAction.ALLOW.toString());
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
@@ -115,6 +120,7 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         when(mailManagerClient.createTrafficPolicy(any(CreateTrafficPolicyRequest.class))).thenReturn(fakeCreateTrafficPolicyResponse());
         when(mailManagerClient.getTrafficPolicy(any(GetTrafficPolicyRequest.class))).thenReturn(fakeGetTrafficPolicyResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -131,6 +137,8 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModel().getPolicyStatements().get(0).getConditions().size()).isEqualTo(1);
         assertThat(response.getResourceModel().getPolicyStatements().get(1).getConditions().size()).isEqualTo(1);
         assertThat(response.getResourceModel().getDefaultAction()).isEqualTo(AcceptAction.ALLOW.toString());
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();

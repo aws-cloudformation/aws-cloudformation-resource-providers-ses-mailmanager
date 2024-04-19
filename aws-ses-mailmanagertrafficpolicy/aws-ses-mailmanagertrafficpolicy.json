@@ -314,13 +314,29 @@
                 "Conditions"
             ],
             "additionalProperties": false
+        },
+        "Tag": {
+            "type": "object",
+            "properties": {
+                "Key": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "pattern": "^[a-zA-Z0-9/_\\+=\\.:@\\-]+$"
+                },
+                "Value": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "minLength": 0,
+                    "pattern": "^[a-zA-Z0-9/_\\+=\\.:@\\-]*$"
+                }
+            },
+            "required": [
+                "Key",
+                "Value"
+            ],
+            "additionalProperties": false
         }
-    },
-    "tagging": {
-        "taggable": false,
-        "tagOnCreate": false,
-        "tagUpdatable": false,
-        "cloudFormationSystemTags": false
     },
     "properties": {
         "DefaultAction": {
@@ -335,6 +351,14 @@
             "items": {
                 "$ref": "#/definitions/PolicyStatement"
             }
+        },
+        "Tags": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Tag"
+            },
+            "maxItems": 200,
+            "minItems": 0
         },
         "TrafficPolicyArn": {
             "type": "string"
@@ -351,6 +375,13 @@
             "pattern": "^[A-Za-z0-9_\\-]+$"
         }
     },
+    "tagging": {
+        "taggable": true,
+        "tagOnCreate": true,
+        "tagUpdatable": true,
+        "cloudFormationSystemTags": true,
+        "tagProperty": "/properties/Tags"
+    },
     "required": [
         "DefaultAction",
         "PolicyStatements"
@@ -365,17 +396,23 @@
     "handlers": {
         "create": {
             "permissions": [
+                "ses:TagResource",
+                "ses:ListTagsForResource",
                 "ses:GetTrafficPolicy",
                 "ses:CreateTrafficPolicy"
             ]
         },
         "read": {
             "permissions": [
+                "ses:ListTagsForResource",
                 "ses:GetTrafficPolicy"
             ]
         },
         "update": {
             "permissions": [
+                "ses:TagResource",
+                "ses:UntagResource",
+                "ses:ListTagsForResource",
                 "ses:GetTrafficPolicy",
                 "ses:UpdateTrafficPolicy"
             ]

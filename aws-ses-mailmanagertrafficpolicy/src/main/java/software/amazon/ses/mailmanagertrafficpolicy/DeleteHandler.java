@@ -28,15 +28,19 @@ public class DeleteHandler extends BaseHandlerStd {
         logger.log(String.format("[ClientRequestToken: %s] Trying to delete TrafficPolicy ID %s", clientRequestToken, model.getTrafficPolicyId()));
 
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
-                .then(progress ->
-                        proxy.initiate("AWS-SES-MailManagerTrafficPolicy::Delete", proxyClient, model, callbackContext)
-                                .translateToServiceRequest(Translator::translateToDeleteRequest)
-                                .makeServiceCall((deleteTrafficPolicyRequest, _proxyClient) -> deleteResource(deleteTrafficPolicyRequest, _proxyClient, clientRequestToken))
-                                .handleError((deleteTrafficPolicyRequest, _exception, _proxyClient, _resourceModel, _callbackContext) ->
-                                        handleError(_exception, _resourceModel, _callbackContext, logger, clientRequestToken))
-                                .progress()
+                .then(
+                        progress ->
+                                proxy.initiate("AWS-SES-MailManagerTrafficPolicy::Delete", proxyClient, model, callbackContext)
+                                        .translateToServiceRequest(Translator::translateToDeleteRequest)
+                                        .makeServiceCall((deleteTrafficPolicyRequest, _proxyClient)
+                                                -> deleteResource(deleteTrafficPolicyRequest, _proxyClient, clientRequestToken))
+                                        .handleError((deleteTrafficPolicyRequest, _exception, _proxyClient, _resourceModel, _callbackContext)
+                                                -> handleError(_exception, _resourceModel, _callbackContext, logger, clientRequestToken))
+                                        .progress()
                 )
-                .then(progress -> ProgressEvent.defaultSuccessHandler(null));
+                .then(
+                        progress -> ProgressEvent.defaultSuccessHandler(null)
+                );
     }
 
     private DeleteTrafficPolicyResponse deleteResource(
