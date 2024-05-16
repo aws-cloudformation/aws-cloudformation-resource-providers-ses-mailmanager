@@ -48,12 +48,41 @@
                 "FAILED"
             ]
         },
+        "IngressPointStatusToUpdate": {
+            "type": "string",
+            "enum": [
+                "ACTIVE",
+                "CLOSED"
+            ]
+        },
         "IngressPointType": {
             "type": "string",
             "enum": [
-                "OPEN_RELAY",
-                "AUTH_RELAY"
+                "OPEN",
+                "AUTH"
             ]
+        },
+        "Tag": {
+            "type": "object",
+            "properties": {
+                "Key": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 1,
+                    "pattern": "^[a-zA-Z0-9/_\\+=\\.:@\\-]+$"
+                },
+                "Value": {
+                    "type": "string",
+                    "maxLength": 256,
+                    "minLength": 0,
+                    "pattern": "^[a-zA-Z0-9/_\\+=\\.:@\\-]*$"
+                }
+            },
+            "required": [
+                "Key",
+                "Value"
+            ],
+            "additionalProperties": false
         }
     },
     "properties": {
@@ -87,18 +116,30 @@
             "maxLength": 100,
             "minLength": 1
         },
+        "Status": {
+            "$ref": "#/definitions/IngressPointStatus"
+        },
+        "StatusToUpdate": {
+            "$ref": "#/definitions/IngressPointStatusToUpdate"
+        },
+        "Tags": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Tag"
+            },
+            "maxItems": 200,
+            "minItems": 0
+        },
         "Type": {
             "$ref": "#/definitions/IngressPointType"
-        },
-        "IngressPointStatus": {
-            "$ref": "#/definitions/IngressPointStatus"
         }
     },
     "tagging": {
-        "taggable": false,
-        "tagOnCreate": false,
-        "tagUpdatable": false,
-        "cloudFormationSystemTags": false
+        "taggable": true,
+        "tagOnCreate": true,
+        "tagUpdatable": true,
+        "cloudFormationSystemTags": true,
+        "tagProperty": "/properties/Tags"
     },
     "required": [
         "Type",
@@ -108,7 +149,7 @@
     "readOnlyProperties": [
         "/properties/IngressPointId",
         "/properties/IngressPointArn",
-        "/properties/IngressPointStatus",
+        "/properties/Status",
         "/properties/ARecord"
     ],
     "createOnlyProperties": [
@@ -123,17 +164,24 @@
     "handlers": {
         "create": {
             "permissions": [
+                "ses:TagResource",
+                "ses:ListTagsForResource",
                 "ses:GetIngressPoint",
-                "ses:CreateIngressPoint"
+                "ses:CreateIngressPoint",
+                "iam:CreateServiceLinkedRole"
             ]
         },
         "read": {
             "permissions": [
+                "ses:ListTagsForResource",
                 "ses:GetIngressPoint"
             ]
         },
         "update": {
             "permissions": [
+                "ses:TagResource",
+                "ses:UntagResource",
+                "ses:ListTagsForResource",
                 "ses:GetIngressPoint",
                 "ses:UpdateIngressPoint"
             ]

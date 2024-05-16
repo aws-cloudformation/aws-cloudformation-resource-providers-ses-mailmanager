@@ -1,6 +1,6 @@
 {
     "IngressPointName": "ingress_point_new_name",
-    "Type": "OPEN_RELAY",
+    "Type": "OPEN",
     "TrafficPolicyId": "traffic_policy_id",
     "RuleSetId": "rule_set_id"
 }

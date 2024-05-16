@@ -61,7 +61,7 @@ public class DeleteHandlerTest extends AbstractTestBase {
                 .trafficPolicyId(HandlerHelper.INGRESS_POINT_TRAFFIC_POLICY_ID)
                 .ruleSetId(HandlerHelper.INGRESS_POINT_RULE_SET_ID)
                 .type(HandlerHelper.INGRESS_POINT_OPEN_RELAY)
-                .ingressPointStatus(HandlerHelper.INGRESS_POINT_STATUS)
+                .status(HandlerHelper.INGRESS_POINT_STATUS)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
@@ -95,7 +95,7 @@ public class DeleteHandlerTest extends AbstractTestBase {
                 .trafficPolicyId(HandlerHelper.INGRESS_POINT_TRAFFIC_POLICY_ID)
                 .ruleSetId(HandlerHelper.INGRESS_POINT_RULE_SET_ID)
                 .type(HandlerHelper.INGRESS_POINT_OPEN_RELAY)
-                .ingressPointStatus(HandlerHelper.INGRESS_POINT_STATUS)
+                .status(HandlerHelper.INGRESS_POINT_STATUS)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()

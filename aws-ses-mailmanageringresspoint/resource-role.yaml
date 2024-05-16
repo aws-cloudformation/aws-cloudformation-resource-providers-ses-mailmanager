@@ -30,10 +30,14 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                - "iam:CreateServiceLinkedRole"
                 - "ses:CreateIngressPoint"
                 - "ses:DeleteIngressPoint"
                 - "ses:GetIngressPoint"
                 - "ses:ListIngressPoints"
+                - "ses:ListTagsForResource"
+                - "ses:TagResource"
+                - "ses:UntagResource"
                 - "ses:UpdateIngressPoint"
                 Resource: "*"
 Outputs:

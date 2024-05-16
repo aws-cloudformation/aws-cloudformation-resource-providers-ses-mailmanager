@@ -9,6 +9,7 @@ import software.amazon.awssdk.services.mailmanager.model.ConflictException;
 import software.amazon.awssdk.services.mailmanager.model.CreateIngressPointRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetIngressPointRequest;
 import software.amazon.awssdk.services.mailmanager.model.IngressPointStatus;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.ValidationException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static software.amazon.ses.mailmanageringresspoint.HandlerHelper.LOGICAL_RESOURCE_ID;
+import static software.amazon.ses.mailmanageringresspoint.HandlerHelper.fakeListTagsForResourceResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
@@ -85,7 +87,7 @@ public class CreateHandlerTest extends AbstractTestBase {
         when(mailManagerClient.getIngressPoint(any(GetIngressPointRequest.class)))
                 .thenReturn(HandlerHelper.fakeGetIngressPointResponse(HandlerHelper.INGRESS_POINT_AUTH_RELAY, IngressPointStatus.PROVISIONING.toString())) // Reproduce stabilization process
                 .thenReturn(HandlerHelper.fakeGetIngressPointResponse(HandlerHelper.INGRESS_POINT_AUTH_RELAY, IngressPointStatus.ACTIVE.toString()));
-
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
@@ -98,6 +100,32 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    @Tag("SkipTearDown")
+    public void handle_request_failure_due_to_status_to_update() {
+        final CreateHandler handler = new CreateHandler();
+
+        final ResourceModel model = ResourceModel.builder()
+                .ingressPointName(HandlerHelper.INGRESS_POINT_NAME)
+                .trafficPolicyId(HandlerHelper.INGRESS_POINT_TRAFFIC_POLICY_ID)
+                .ruleSetId(HandlerHelper.INGRESS_POINT_RULE_SET_ID)
+                .type(HandlerHelper.INGRESS_POINT_AUTH_RELAY)
+                .statusToUpdate("OPEN")
+                .ingressPointConfiguration(
+                        software.amazon.ses.mailmanageringresspoint.IngressPointConfiguration.builder()
+                                .smtpPassword(HandlerHelper.INGRESS_POINT_AUTH_PASSWORD)
+                                .build()
+                )
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .clientRequestToken(HandlerHelper.CLIENT_REQUEST_TOKEN)
+                .build();
+
+        assertThrows(CfnInvalidRequestException.class, () -> handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger));
     }
 
     @Test
@@ -118,6 +146,7 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         when(mailManagerClient.createIngressPoint(any(CreateIngressPointRequest.class))).thenReturn(HandlerHelper.fakeCreateIngressPointResponse());
         when(mailManagerClient.getIngressPoint(any(GetIngressPointRequest.class))).thenReturn(HandlerHelper.fakeGetIngressPointResponse(HandlerHelper.INGRESS_POINT_OPEN_RELAY, IngressPointStatus.ACTIVE.toString()));
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
