@@ -7,13 +7,14 @@ import software.amazon.awssdk.services.mailmanager.model.IngressPoint;
 import software.amazon.awssdk.services.mailmanager.model.IngressPointStatus;
 import software.amazon.awssdk.services.mailmanager.model.IngressPointType;
 import software.amazon.awssdk.services.mailmanager.model.ListIngressPointsResponse;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceResponse;
 import software.amazon.awssdk.services.mailmanager.model.UpdateIngressPointResponse;
 
 public class HandlerHelper {
     public static final String INGRESS_POINT_ID = "ingressPoint_id";
     public static final String INGRESS_POINT_NAME = "ingressPoint_name";
-    public static final String INGRESS_POINT_OPEN_RELAY = IngressPointType.OPEN_RELAY.toString();
-    public static final String INGRESS_POINT_AUTH_RELAY = IngressPointType.AUTH_RELAY.toString();
+    public static final String INGRESS_POINT_OPEN_RELAY = IngressPointType.OPEN.toString();
+    public static final String INGRESS_POINT_AUTH_RELAY = IngressPointType.AUTH.toString();
     public static final String INGRESS_POINT_STATUS = IngressPointStatus.ACTIVE.toString();
     public static final String INGRESS_POINT_ARN = "ingressPoint_arn";
     public static final String INGRESS_POINT_A_RECORD = "ingressPoint_aRecord";
@@ -33,6 +34,21 @@ public class HandlerHelper {
                 .aRecord(INGRESS_POINT_A_RECORD)
                 .type(type)
                 .status(status)
+                .build();
+    }
+
+    static ListTagsForResourceResponse fakeListTagsForResourceResponse() {
+        return ListTagsForResourceResponse.builder()
+                .tags(
+                        software.amazon.awssdk.services.mailmanager.model.Tag.builder()
+                                .key("keyOne")
+                                .value("valueOne")
+                                .build(),
+                        software.amazon.awssdk.services.mailmanager.model.Tag.builder()
+                                .key("keyTwo")
+                                .value("valueTwo")
+                                .build()
+                )
                 .build();
     }
 

@@ -4,6 +4,7 @@ import com.amazonaws.util.StringUtils;
 import software.amazon.awssdk.services.mailmanager.model.CreateIngressPointRequest;
 import software.amazon.awssdk.services.mailmanager.model.CreateIngressPointResponse;
 import software.amazon.awssdk.services.mailmanager.model.IngressPointStatus;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
@@ -27,6 +28,10 @@ public class CreateHandler extends BaseHandlerStd {
 
         final ResourceModel model = request.getDesiredResourceState();
         final String clientRequestToken = request.getClientRequestToken();
+
+        if (model.getStatusToUpdate() != null) {
+            throw new CfnInvalidRequestException("IngressPoint's status can only be updated after it is created.");
+        }
 
         if (StringUtils.isNullOrEmpty(model.getIngressPointName())) {
             final String ingressPointName = IdentifierUtils.generateResourceIdentifier(

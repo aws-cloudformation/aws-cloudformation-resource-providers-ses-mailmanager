@@ -1,7 +1,6 @@
 package software.amazon.ses.mailmanageringresspoint;
 
 import lombok.NonNull;
-import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.services.mailmanager.model.CreateIngressPointRequest;
 import software.amazon.awssdk.services.mailmanager.model.DeleteIngressPointRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetIngressPointRequest;
@@ -10,6 +9,9 @@ import software.amazon.awssdk.services.mailmanager.model.IngressPointConfigurati
 import software.amazon.awssdk.services.mailmanager.model.IngressPointType;
 import software.amazon.awssdk.services.mailmanager.model.ListIngressPointsRequest;
 import software.amazon.awssdk.services.mailmanager.model.ListIngressPointsResponse;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.TagResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.UntagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UpdateIngressPointRequest;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 
@@ -21,6 +23,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static software.amazon.ses.mailmanageringresspoint.TagHelper.convertToSet;
+import static software.amazon.ses.mailmanageringresspoint.utils.TagsConvertor.convertToSdk;
 
 public class Translator {
 
@@ -45,6 +50,7 @@ public class Translator {
             )
             .ruleSetId(model.getRuleSetId())
             .trafficPolicyId(model.getTrafficPolicyId())
+            .tags(convertToSdk(model.getTags()))
             .build();
   }
 
@@ -73,7 +79,8 @@ public class Translator {
             .ingressPointArn(ingressPointResponse.ingressPointArn())
             .trafficPolicyId(ingressPointResponse.trafficPolicyId())
             .ruleSetId(ingressPointResponse.ruleSetId())
-            .ingressPointStatus(ingressPointResponse.statusAsString())
+            .status(ingressPointResponse.statusAsString())
+            .statusToUpdate(ingressPointResponse.statusAsString())
             .type(ingressPointResponse.typeAsString())
             .aRecord(ingressPointResponse.aRecord())
             .build();
@@ -92,6 +99,18 @@ public class Translator {
   }
 
   /**
+   * Request the list of resource's tags
+   *
+   * @param model resource model
+   * @return awsRequest the aws service request to list resources within aws account
+   */
+  static ListTagsForResourceRequest translateToListTagsForResourceRequest(final ResourceModel model) {
+    return ListTagsForResourceRequest.builder()
+            .resourceArn(model.getIngressPointArn())
+            .build();
+  }
+
+  /**
    * Request to update properties of a previously created resource
    *
    * @param model resource model
@@ -102,10 +121,11 @@ public class Translator {
     UpdateIngressPointRequest.Builder builder = UpdateIngressPointRequest.builder()
             .ingressPointId(model.getIngressPointId())
             .ruleSetId(model.getRuleSetId())
+            .statusToUpdate(model.getStatusToUpdate())
             .trafficPolicyId(model.getTrafficPolicyId());
 
     // AUTH RELAY
-    if (Objects.equals(model.getType(), IngressPointType.AUTH_RELAY.toString())) {
+    if (Objects.equals(model.getType(), IngressPointType.AUTH.toString()) && model.getIngressPointConfiguration() != null) {
       return builder.ingressPointConfiguration(IngressPointConfiguration.builder()
               .smtpPassword(model.getIngressPointConfiguration().getSmtpPassword()).build()
       ).build();
@@ -116,8 +136,8 @@ public class Translator {
   }
 
   private static void modelValidator(final ResourceModel model) {
-    if (Objects.equals(model.getType(), IngressPointType.OPEN_RELAY.toString()) && model.getIngressPointConfiguration() != null) {
-      throw new CfnInvalidRequestException("An OPEN_RELAY MUST NOT be established using IngressPointConfiguration, since it's utilized for AUTH_RELAY authentication.");
+    if (Objects.equals(model.getType(), IngressPointType.OPEN.toString()) && model.getIngressPointConfiguration() != null) {
+      throw new CfnInvalidRequestException("An OPEN IngressPoint MUST NOT be established using IngressPointConfiguration, since it's utilized for AUTH IngressPoint authentication.");
     }
   }
 
@@ -151,25 +171,27 @@ public class Translator {
 
   /**
    * Request to add tags to a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static TagResourceRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
+    return TagResourceRequest.builder()
+            .resourceArn(model.getIngressPointArn())
+            .tags(convertToSet(addedTags))
+            .build();
   }
 
   /**
    * Request to add tags to a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static UntagResourceRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
+    return UntagResourceRequest.builder()
+            .resourceArn(model.getIngressPointArn())
+            .tagKeys(removedTags)
+            .build();
   }
 }

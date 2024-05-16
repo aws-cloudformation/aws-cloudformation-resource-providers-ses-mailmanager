@@ -16,7 +16,9 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#ingresspointconfiguration" title="IngressPointConfiguration">IngressPointConfiguration</a>" : <i><a href="ingresspointconfiguration.md">IngressPointConfiguration</a></i>,
         "<a href="#ingresspointname" title="IngressPointName">IngressPointName</a>" : <i>String</i>,
         "<a href="#rulesetid" title="RuleSetId">RuleSetId</a>" : <i>String</i>,
-        "<a href="#type" title="Type">Type</a>" : <i>String</i>,
+        "<a href="#statustoupdate" title="StatusToUpdate">StatusToUpdate</a>" : <i>String</i>,
+        "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>,
+        "<a href="#type" title="Type">Type</a>" : <i>String</i>
     }
 }
 </pre>
@@ -30,6 +32,9 @@ Properties:
     <a href="#ingresspointconfiguration" title="IngressPointConfiguration">IngressPointConfiguration</a>: <i><a href="ingresspointconfiguration.md">IngressPointConfiguration</a></i>
     <a href="#ingresspointname" title="IngressPointName">IngressPointName</a>: <i>String</i>
     <a href="#rulesetid" title="RuleSetId">RuleSetId</a>: <i>String</i>
+    <a href="#statustoupdate" title="StatusToUpdate">StatusToUpdate</a>: <i>String</i>
+    <a href="#tags" title="Tags">Tags</a>: <i>
+      - <a href="tag.md">Tag</a></i>
     <a href="#type" title="Type">Type</a>: <i>String</i>
 </pre>
 
@@ -81,13 +86,31 @@ _Maximum Length_: <code>100</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
+#### StatusToUpdate
+
+_Required_: No
+
+_Type_: String
+
+_Allowed Values_: <code>ACTIVE</code> | <code>CLOSED</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### Tags
+
+_Required_: No
+
+_Type_: List of <a href="tag.md">Tag</a>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
 #### Type
 
 _Required_: Yes
 
 _Type_: String
 
-_Allowed Values_: <code>OPEN_RELAY</code> | <code>AUTH_RELAY</code>
+_Allowed Values_: <code>OPEN</code> | <code>AUTH</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
@@ -111,9 +134,9 @@ Returns the <code>IngressPointId</code> value.
 
 Returns the <code>IngressPointArn</code> value.
 
-#### IngressPointStatus
+#### Status
 
-Returns the <code>IngressPointStatus</code> value.
+Returns the <code>Status</code> value.
 
 #### ARecord
 
