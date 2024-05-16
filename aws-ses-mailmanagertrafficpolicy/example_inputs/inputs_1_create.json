@@ -64,7 +64,7 @@
                         "Evaluate": {
                             "Attribute": "SENDER_IP"
                         },
-                        "Operator": "CIDR_NOT_IN",
+                        "Operator": "NOT_CIDR_MATCHES",
                         "Value": [
                             "127.0.0.0/16"
                         ]
