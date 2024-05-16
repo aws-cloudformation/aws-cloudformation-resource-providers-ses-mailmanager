@@ -73,9 +73,7 @@
         "IngressIpOperator": {
             "type": "string",
             "enum": [
-                "CIDR_IN",
                 "CIDR_MATCHES",
-                "CIDR_NOT_IN",
                 "NOT_CIDR_MATCHES"
             ]
         },
