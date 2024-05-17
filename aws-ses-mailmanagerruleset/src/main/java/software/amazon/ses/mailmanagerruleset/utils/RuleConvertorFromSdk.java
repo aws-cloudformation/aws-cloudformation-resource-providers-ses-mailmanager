@@ -96,7 +96,7 @@ public class RuleConvertorFromSdk {
         }
 
         return AddHeaderAction.builder()
-                .headerKey(source.headerKey())
+                .headerName(source.headerName())
                 .headerValue(source.headerValue())
                 .build();
     }
@@ -200,7 +200,7 @@ public class RuleConvertorFromSdk {
 
         return RuleDmarcExpression.builder()
                 .operator(source.operatorAsString())
-                .values(source.valueAsStrings()) // TODO: Need to change value into values
+                .values(source.valuesAsStrings())
                 .build();
     }
 
@@ -224,7 +224,7 @@ public class RuleConvertorFromSdk {
         return RuleStringExpression.builder()
                 .evaluate(ConvertFromSdk(source.evaluate()))
                 .operator(source.operatorAsString())
-                .values(source.value()) // TODO: Need to change value into values
+                .values(source.values())
                 .build();
     }
 
@@ -236,7 +236,7 @@ public class RuleConvertorFromSdk {
         return RuleIpExpression.builder()
                 .evaluate(ConvertFromSdk(source.evaluate()))
                 .operator(source.operatorAsString())
-                .values(source.value())
+                .values(source.values())
                 .build();
     }
 
@@ -248,7 +248,7 @@ public class RuleConvertorFromSdk {
         return RuleVerdictExpression.builder()
                 .evaluate(ConvertFromSdk(source.evaluate()))
                 .operator(source.operatorAsString())
-                .values(source.valueAsStrings())
+                .values(source.valuesAsStrings())
                 .build();
     }
 
@@ -260,7 +260,6 @@ public class RuleConvertorFromSdk {
 
         return RuleBooleanToEvaluate.builder()
                 .attribute(source.attributeAsString())
-                .analysis(ConvertFromSdk(source.analysis()))
                 .build();
     }
 
@@ -271,7 +270,6 @@ public class RuleConvertorFromSdk {
 
         return RuleNumberToEvaluate.builder()
                 .attribute(source.attributeAsString())
-                .analysis(ConvertFromSdk(source.analysis()))
                 .build();
     }
 
@@ -292,7 +290,6 @@ public class RuleConvertorFromSdk {
 
         return RuleIpToEvaluate.builder()
                 .attribute(source.attributeAsString())
-                .analysis(ConvertFromSdk(source.analysis()))
                 .build();
     }
 

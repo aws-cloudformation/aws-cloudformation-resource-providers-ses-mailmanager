@@ -96,7 +96,7 @@ public class RuleConvertorToSdk {
         }
 
         return software.amazon.awssdk.services.mailmanager.model.AddHeaderAction.builder()
-                .headerKey(source.getHeaderKey())
+                .headerName(source.getHeaderName())
                 .headerValue(source.getHeaderValue())
                 .build();
     }
@@ -200,7 +200,7 @@ public class RuleConvertorToSdk {
 
         return software.amazon.awssdk.services.mailmanager.model.RuleDmarcExpression.builder()
                 .operator(source.getOperator())
-                .valueWithStrings(source.getValues()) // TODO: Need to change valueWithStrings into valuesWithStrings
+                .valuesWithStrings(source.getValues())
                 .build();
     }
 
@@ -224,7 +224,7 @@ public class RuleConvertorToSdk {
         return software.amazon.awssdk.services.mailmanager.model.RuleStringExpression.builder()
                 .evaluate(ConvertToSdk(source.getEvaluate()))
                 .operator(source.getOperator())
-                .value(source.getValues()) // TODO: Need to change value into values
+                .values(source.getValues())
                 .build();
     }
 
@@ -236,7 +236,7 @@ public class RuleConvertorToSdk {
         return software.amazon.awssdk.services.mailmanager.model.RuleIpExpression.builder()
                 .evaluate(ConvertToSdk(source.getEvaluate()))
                 .operator(source.getOperator())
-                .value(source.getValues())
+                .values(source.getValues())
                 .build();
     }
 
@@ -248,7 +248,7 @@ public class RuleConvertorToSdk {
         return software.amazon.awssdk.services.mailmanager.model.RuleVerdictExpression.builder()
                 .evaluate(ConvertToSdk(source.getEvaluate()))
                 .operator(source.getOperator())
-                .valueWithStrings(source.getValues()) // TODO: Need to change value into values
+                .valuesWithStrings(source.getValues())
                 .build();
     }
 
@@ -260,7 +260,6 @@ public class RuleConvertorToSdk {
 
         return software.amazon.awssdk.services.mailmanager.model.RuleBooleanToEvaluate.builder()
                 .attribute(source.getAttribute())
-                .analysis(ConvertToSdk(source.getAnalysis()))
                 .build();
     }
 
@@ -271,7 +270,6 @@ public class RuleConvertorToSdk {
 
         return software.amazon.awssdk.services.mailmanager.model.RuleNumberToEvaluate.builder()
                 .attribute(source.getAttribute())
-                .analysis(ConvertToSdk(source.getAnalysis()))
                 .build();
     }
 
@@ -292,7 +290,6 @@ public class RuleConvertorToSdk {
 
         return software.amazon.awssdk.services.mailmanager.model.RuleIpToEvaluate.builder()
                 .attribute(source.getAttribute())
-                .analysis(ConvertToSdk(source.getAnalysis()))
                 .build();
     }
 

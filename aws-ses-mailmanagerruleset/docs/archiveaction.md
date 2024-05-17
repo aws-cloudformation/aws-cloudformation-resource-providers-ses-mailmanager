@@ -8,6 +8,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
+    "<a href="#actionfailurepolicy" title="ActionFailurePolicy">ActionFailurePolicy</a>" : <i>String</i>,
     "<a href="#targetarchive" title="TargetArchive">TargetArchive</a>" : <i>String</i>
 }
 </pre>
@@ -15,10 +16,21 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
+<a href="#actionfailurepolicy" title="ActionFailurePolicy">ActionFailurePolicy</a>: <i>String</i>
 <a href="#targetarchive" title="TargetArchive">TargetArchive</a>: <i>String</i>
 </pre>
 
 ## Properties
+
+#### ActionFailurePolicy
+
+_Required_: No
+
+_Type_: String
+
+_Allowed Values_: <code>CONTINUE</code> | <code>DROP</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### TargetArchive
 

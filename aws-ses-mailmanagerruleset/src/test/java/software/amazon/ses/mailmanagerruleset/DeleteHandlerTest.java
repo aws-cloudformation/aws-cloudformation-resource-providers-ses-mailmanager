@@ -28,7 +28,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static software.amazon.ses.mailmanagerruleset.HandlerHelper.RULE_SET_ARN;
-import static software.amazon.ses.mailmanagerruleset.HandlerHelper.RULE_SET_DESCRIPTION;
 import static software.amazon.ses.mailmanagerruleset.HandlerHelper.RULE_SET_ID;
 import static software.amazon.ses.mailmanagerruleset.HandlerHelper.RULE_SET_NAME;
 import static software.amazon.ses.mailmanagerruleset.HandlerHelper.generateRules;
@@ -66,9 +65,8 @@ public class DeleteHandlerTest extends AbstractTestBase {
                 .builder()
                 .ruleSetId(RULE_SET_ID)
                 .ruleSetName(RULE_SET_NAME)
-                .ruleSetARN(RULE_SET_ARN)
+                .ruleSetArn(RULE_SET_ARN)
                 .rules(generateRules())
-                .description(RULE_SET_DESCRIPTION)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
@@ -97,9 +95,8 @@ public class DeleteHandlerTest extends AbstractTestBase {
                 .builder()
                 .ruleSetId(RULE_SET_ID)
                 .ruleSetName(RULE_SET_NAME)
-                .ruleSetARN(RULE_SET_ARN)
+                .ruleSetArn(RULE_SET_ARN)
                 .rules(generateRules())
-                .description(RULE_SET_DESCRIPTION)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()

@@ -3,6 +3,7 @@ package software.amazon.ses.mailmanagerruleset;
 import java.time.Duration;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.GetRuleSetRequest;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
@@ -24,9 +25,9 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static software.amazon.ses.mailmanagerruleset.HandlerHelper.RULE_SET_DESCRIPTION;
 import static software.amazon.ses.mailmanagerruleset.HandlerHelper.RULE_SET_NAME;
 import static software.amazon.ses.mailmanagerruleset.HandlerHelper.fakeGetRuleSetResponse;
+import static software.amazon.ses.mailmanagerruleset.HandlerHelper.fakeListTagsForResourceResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadHandlerTest extends AbstractTestBase {
@@ -59,7 +60,6 @@ public class ReadHandlerTest extends AbstractTestBase {
 
         final ResourceModel model = ResourceModel.builder()
                 .ruleSetName(RULE_SET_NAME)
-                .description(RULE_SET_DESCRIPTION)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
@@ -67,13 +67,13 @@ public class ReadHandlerTest extends AbstractTestBase {
                 .build();
 
         when(mailManagerClient.getRuleSet(any(GetRuleSetRequest.class))).thenReturn(fakeGetRuleSetResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModel().getRuleSetName()).isEqualTo(request.getDesiredResourceState().getRuleSetName());
-        assertThat(response.getResourceModel().getDescription()).isEqualTo(request.getDesiredResourceState().getDescription());
         assertThat(response.getResourceModel().getRules()).isNotNull();
         assertThat(response.getResourceModel().getRules()).isNotEmpty();
         assertThat(response.getResourceModels()).isNull();
@@ -87,7 +87,6 @@ public class ReadHandlerTest extends AbstractTestBase {
 
         final ResourceModel model = ResourceModel.builder()
                 .ruleSetName(RULE_SET_NAME)
-                .description(RULE_SET_DESCRIPTION)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()

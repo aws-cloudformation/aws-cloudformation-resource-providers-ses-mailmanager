@@ -42,10 +42,10 @@ public class CreateHandler extends BaseHandlerStd {
                 .then(progress ->
                         proxy.initiate("AWS-SES-MailManagerRuleSet::Create", proxyClient, model, callbackContext)
                                 .translateToServiceRequest(Translator::translateToCreateRequest)
-                                .makeServiceCall((createRuleSetRequest, _proxyClient) ->
-                                        createResource(createRuleSetRequest, _proxyClient, model, clientRequestToken))
-                                .handleError((createRuleSetRequest, exception, _proxyClient, _resourceModel, _callbackContext) ->
-                                        handleError(exception, _resourceModel, _callbackContext, logger, clientRequestToken))
+                                .makeServiceCall((createRuleSetRequest, _proxyClient)
+                                        -> createResource(createRuleSetRequest, _proxyClient, model, clientRequestToken))
+                                .handleError((createRuleSetRequest, exception, _proxyClient, _resourceModel, _callbackContext)
+                                        -> handleError(exception, _resourceModel, _callbackContext, logger, clientRequestToken))
                                 .progress()
                 )
                 .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
