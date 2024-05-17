@@ -3,10 +3,17 @@
     "description": "Definition of AWS::SES::MailManagerRuleSet Resource Type",
     "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ses-mailmanager",
     "definitions": {
+        "ActionFailurePolicy": {
+            "type": "string",
+            "enum": [
+                "CONTINUE",
+                "DROP"
+            ]
+        },
         "AddHeaderAction": {
             "type": "object",
             "properties": {
-                "HeaderKey": {
+                "HeaderName": {
                     "type": "string",
                     "maxLength": 64,
                     "minLength": 1,
@@ -19,7 +26,7 @@
                 }
             },
             "required": [
-                "HeaderKey",
+                "HeaderName",
                 "HeaderValue"
             ],
             "additionalProperties": false
@@ -47,6 +54,9 @@
         "ArchiveAction": {
             "type": "object",
             "properties": {
+                "ActionFailurePolicy": {
+                    "$ref": "#/definitions/ActionFailurePolicy"
+                },
                 "TargetArchive": {
                     "type": "string",
                     "maxLength": 2048,
@@ -62,6 +72,9 @@
         "DeliverToMailboxAction": {
             "type": "object",
             "properties": {
+                "ActionFailurePolicy": {
+                    "$ref": "#/definitions/ActionFailurePolicy"
+                },
                 "MailboxArn": {
                     "type": "string",
                     "maxLength": 2048,
@@ -72,7 +85,7 @@
                     "type": "string",
                     "maxLength": 2048,
                     "minLength": 20,
-                    "pattern": "^arn:aws(|-cn|-us-gov):iam::\\d{12}:role\\/[a-zA-Z0-9_\\-\\.]{1,64}$"
+                    "pattern": "^[a-zA-Z0-9:_/+=,@.#-]+$"
                 }
             },
             "required": [
@@ -95,6 +108,9 @@
         "RelayAction": {
             "type": "object",
             "properties": {
+                "ActionFailurePolicy": {
+                    "$ref": "#/definitions/ActionFailurePolicy"
+                },
                 "Relay": {
                     "type": "string",
                     "maxLength": 2048,
@@ -320,19 +336,6 @@
                         "Attribute"
                     ],
                     "additionalProperties": false
-                },
-                {
-                    "type": "object",
-                    "title": "Analysis",
-                    "properties": {
-                        "Analysis": {
-                            "$ref": "#/definitions/Analysis"
-                        }
-                    },
-                    "required": [
-                        "Analysis"
-                    ],
-                    "additionalProperties": false
                 }
             ]
         },
@@ -509,19 +512,6 @@
                         "Attribute"
                     ],
                     "additionalProperties": false
-                },
-                {
-                    "type": "object",
-                    "title": "Analysis",
-                    "properties": {
-                        "Analysis": {
-                            "$ref": "#/definitions/Analysis"
-                        }
-                    },
-                    "required": [
-                        "Analysis"
-                    ],
-                    "additionalProperties": false
                 }
             ]
         },
@@ -574,19 +564,6 @@
                     },
                     "required": [
                         "Attribute"
-                    ],
-                    "additionalProperties": false
-                },
-                {
-                    "type": "object",
-                    "title": "Analysis",
-                    "properties": {
-                        "Analysis": {
-                            "$ref": "#/definitions/Analysis"
-                        }
-                    },
-                    "required": [
-                        "Analysis"
                     ],
                     "additionalProperties": false
                 }
@@ -740,10 +717,14 @@
         "S3Action": {
             "type": "object",
             "properties": {
+                "ActionFailurePolicy": {
+                    "$ref": "#/definitions/ActionFailurePolicy"
+                },
                 "RoleArn": {
                     "type": "string",
                     "maxLength": 2048,
-                    "minLength": 20
+                    "minLength": 20,
+                    "pattern": "^[a-zA-Z0-9:_/+=,@.#-]+$"
                 },
                 "S3Bucket": {
                     "type": "string",
@@ -765,6 +746,7 @@
                 }
             },
             "required": [
+                "RoleArn",
                 "S3Bucket"
             ],
             "additionalProperties": false
@@ -772,10 +754,14 @@
         "SendAction": {
             "type": "object",
             "properties": {
+                "ActionFailurePolicy": {
+                    "$ref": "#/definitions/ActionFailurePolicy"
+                },
                 "RoleArn": {
                     "type": "string",
                     "maxLength": 2048,
-                    "minLength": 20
+                    "minLength": 20,
+                    "pattern": "^[a-zA-Z0-9:_/+=,@.#-]+$"
                 }
             },
             "required": [
@@ -807,19 +793,14 @@
         }
     },
     "tagging": {
-        "taggable": false,
-        "tagOnCreate": false,
-        "tagUpdatable": false,
-        "cloudFormationSystemTags": false
+        "taggable": true,
+        "tagOnCreate": true,
+        "tagUpdatable": true,
+        "cloudFormationSystemTags": true,
+        "tagProperty": "/properties/Tags"
     },
     "properties": {
-        "Description": {
-            "type": "string",
-            "maxLength": 256,
-            "minLength": 0,
-            "pattern": "^[\\s)(a-zA-Z0-9_.-]*$"
-        },
-        "RuleSetARN": {
+        "RuleSetArn": {
             "type": "string"
         },
         "RuleSetId": {
@@ -851,11 +832,10 @@
         }
     },
     "required": [
-        "Description",
         "Rules"
     ],
     "readOnlyProperties": [
-        "/properties/RuleSetARN",
+        "/properties/RuleSetArn",
         "/properties/RuleSetId"
     ],
     "writeOnlyProperties": [
@@ -870,17 +850,23 @@
     "handlers": {
         "create": {
             "permissions": [
+                "ses:TagResource",
+                "ses:ListTagsForResource",
                 "ses:GetRuleSet",
                 "ses:CreateRuleSet"
             ]
         },
         "read": {
             "permissions": [
+                "ses:ListTagsForResource",
                 "ses:GetRuleSet"
             ]
         },
         "update": {
             "permissions": [
+                "ses:TagResource",
+                "ses:UntagResource",
+                "ses:ListTagsForResource",
                 "ses:GetRuleSet",
                 "ses:UpdateRuleSet"
             ]

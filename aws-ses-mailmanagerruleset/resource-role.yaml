@@ -34,6 +34,9 @@ Resources:
                 - "ses:DeleteRuleSet"
                 - "ses:GetRuleSet"
                 - "ses:ListRuleSets"
+                - "ses:ListTagsForResource"
+                - "ses:TagResource"
+                - "ses:UntagResource"
                 - "ses:UpdateRuleSet"
                 Resource: "*"
 Outputs:

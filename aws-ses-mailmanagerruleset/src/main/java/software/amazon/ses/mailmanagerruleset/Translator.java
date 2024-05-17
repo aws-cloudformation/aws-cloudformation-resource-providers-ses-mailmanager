@@ -1,12 +1,14 @@
 package software.amazon.ses.mailmanagerruleset;
 
-import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.services.mailmanager.model.CreateRuleSetRequest;
 import software.amazon.awssdk.services.mailmanager.model.DeleteRuleSetRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetRuleSetRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetRuleSetResponse;
 import software.amazon.awssdk.services.mailmanager.model.ListRuleSetsRequest;
 import software.amazon.awssdk.services.mailmanager.model.ListRuleSetsResponse;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.TagResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.UntagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UpdateRuleSetRequest;
 import software.amazon.ses.mailmanagerruleset.utils.RuleConvertorFromSdk;
 import software.amazon.ses.mailmanagerruleset.utils.RuleConvertorToSdk;
@@ -18,6 +20,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static software.amazon.ses.mailmanagerruleset.TagHelper.convertToSet;
+import static software.amazon.ses.mailmanagerruleset.utils.TagsConvertor.convertToSdk;
 
 /**
  * This class is a centralized placeholder for
@@ -38,7 +43,7 @@ public class Translator {
     return CreateRuleSetRequest.builder()
             .ruleSetName(model.getRuleSetName())
             .rules(RuleConvertorToSdk.ConvertToSdk(model.getRules()))
-            .description(model.getDescription())
+            .tags(convertToSdk(model.getTags()))
             .build();
   }
 
@@ -64,9 +69,8 @@ public class Translator {
     return ResourceModel.builder()
             .ruleSetId(response.ruleSetId())
             .ruleSetName(response.ruleSetName())
-            .ruleSetARN(response.ruleSetARN())
+            .ruleSetArn(response.ruleSetArn())
             .rules(RuleConvertorFromSdk.ConvertFromSdk(response.rules()))
-            .description(response.description())
             .build();
   }
 
@@ -93,7 +97,6 @@ public class Translator {
             .ruleSetId(model.getRuleSetId())
             .ruleSetName(model.getRuleSetName())
             .rules(RuleConvertorToSdk.ConvertToSdk(model.getRules()))
-            .description(model.getDescription())
             .build();
   }
 
@@ -106,6 +109,18 @@ public class Translator {
   static ListRuleSetsRequest translateToListRequest(final String nextToken) {
     return ListRuleSetsRequest.builder()
             .nextToken(nextToken)
+            .build();
+  }
+
+  /**
+   * Request the list of resource's tags
+   *
+   * @param model resource model
+   * @return awsRequest the aws service request to list resources within aws account
+   */
+  static ListTagsForResourceRequest translateToListTagsForResourceRequest(final ResourceModel model) {
+    return ListTagsForResourceRequest.builder()
+            .resourceArn(model.getRuleSetArn())
             .build();
   }
 
@@ -136,11 +151,11 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static TagResourceRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
+    return TagResourceRequest.builder()
+            .resourceArn(model.getRuleSetArn())
+            .tags(convertToSet(addedTags))
+            .build();
   }
 
   /**
@@ -149,10 +164,10 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static UntagResourceRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
+    return UntagResourceRequest.builder()
+            .resourceArn(model.getRuleSetArn())
+            .tagKeys(removedTags)
+            .build();
   }
 }

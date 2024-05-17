@@ -8,7 +8,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "<a href="#headerkey" title="HeaderKey">HeaderKey</a>" : <i>String</i>,
+    "<a href="#headername" title="HeaderName">HeaderName</a>" : <i>String</i>,
     "<a href="#headervalue" title="HeaderValue">HeaderValue</a>" : <i>String</i>
 }
 </pre>
@@ -16,13 +16,13 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 ### YAML
 
 <pre>
-<a href="#headerkey" title="HeaderKey">HeaderKey</a>: <i>String</i>
+<a href="#headername" title="HeaderName">HeaderName</a>: <i>String</i>
 <a href="#headervalue" title="HeaderValue">HeaderValue</a>: <i>String</i>
 </pre>
 
 ## Properties
 
-#### HeaderKey
+#### HeaderName
 
 _Required_: Yes
 
