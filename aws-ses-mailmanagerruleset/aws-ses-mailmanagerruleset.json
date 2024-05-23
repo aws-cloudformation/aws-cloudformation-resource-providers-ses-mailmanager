@@ -838,12 +838,6 @@
         "/properties/RuleSetArn",
         "/properties/RuleSetId"
     ],
-    "writeOnlyProperties": [
-        "/properties/Tags"
-    ],
-    "createOnlyProperties": [
-        "/properties/Tags"
-    ],
     "primaryIdentifier": [
         "/properties/RuleSetId"
     ],
