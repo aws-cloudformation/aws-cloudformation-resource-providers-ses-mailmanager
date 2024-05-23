@@ -3,9 +3,12 @@
     "ServerName": "https://localhost",
     "ServerPort": 25,
     "Authentication": {
-        "PasswordAuthentication": {
-            "Username": "username",
-            "Password": "password"
+        "SecretArn": "arn:aws:secretsmanager:us-east-1:123456789012:secret:name-ABCDE"
+    },
+    "Tags": [
+        {
+            "Key": "KeyOne",
+            "Value": "ValueOne"
         }
-    }
+    ]
 }

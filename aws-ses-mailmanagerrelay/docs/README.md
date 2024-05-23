@@ -54,7 +54,7 @@ _Minimum Length_: <code>1</code>
 
 _Maximum Length_: <code>100</code>
 
-_Pattern_: <code>^[\x21-\x7e]+$</code>
+_Pattern_: <code>^[a-zA-Z0-9-_]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -68,7 +68,7 @@ _Minimum Length_: <code>1</code>
 
 _Maximum Length_: <code>100</code>
 
-_Pattern_: <code>^[\x21-\x7e]+$</code>
+_Pattern_: <code>^[a-zA-Z0-9-\.]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -86,7 +86,7 @@ _Required_: No
 
 _Type_: List of <a href="tag.md">Tag</a>
 
-_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 ## Return Values
 
@@ -100,9 +100,9 @@ The `Fn::GetAtt` intrinsic function returns a value for a specified attribute of
 
 For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::GetAtt](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html).
 
-#### RelayARN
+#### RelayArn
 
-Returns the <code>RelayARN</code> value.
+Returns the <code>RelayArn</code> value.
 
 #### RelayId
 

@@ -3,57 +3,40 @@
     "description": "Definition of AWS::SES::MailManagerRelay Resource Type",
     "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-ses-mailmanager",
     "definitions": {
+        "NoAuthentication": {
+            "type": "object",
+            "additionalProperties": false
+        },
         "RelayAuthentication": {
             "oneOf": [
-                {
-                    "type": "object",
-                    "title": "PasswordAuthentication",
-                    "properties": {
-                        "PasswordAuthentication": {
-                            "$ref": "#/definitions/RelayPasswordAuthentication"
-                        }
-                    },
-                    "required": [
-                        "PasswordAuthentication"
-                    ],
-                    "additionalProperties": false
-                },
                 {
                     "type": "object",
                     "title": "SecretArn",
                     "properties": {
                         "SecretArn": {
-                            "type": "string"
+                            "type": "string",
+                            "pattern": "^arn:(aws|aws-cn|aws-us-gov):secretsmanager:[a-z0-9-]+:\\d{12}:secret:[a-zA-Z0-9/_+=,.@-]+$"
                         }
                     },
                     "required": [
                         "SecretArn"
                     ],
                     "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "title": "NoAuthentication",
+                    "properties": {
+                        "NoAuthentication": {
+                            "$ref": "#/definitions/NoAuthentication"
+                        }
+                    },
+                    "required": [
+                        "NoAuthentication"
+                    ],
+                    "additionalProperties": false
                 }
             ]
-        },
-        "RelayPasswordAuthentication": {
-            "type": "object",
-            "properties": {
-                "Username": {
-                    "type": "string",
-                    "maxLength": 1024,
-                    "minLength": 1,
-                    "pattern": "^[\\x21-\\x7e]+$"
-                },
-                "Password": {
-                    "type": "string",
-                    "maxLength": 72,
-                    "minLength": 6,
-                    "pattern": "^[\\x21-\\x7e]+$"
-                }
-            },
-            "required": [
-                "Password",
-                "Username"
-            ],
-            "additionalProperties": false
         },
         "Tag": {
             "type": "object",
@@ -79,16 +62,17 @@
         }
     },
     "tagging": {
-        "taggable": false,
-        "tagOnCreate": false,
-        "tagUpdatable": false,
-        "cloudFormationSystemTags": false
+        "taggable": true,
+        "tagOnCreate": true,
+        "tagUpdatable": true,
+        "cloudFormationSystemTags": true,
+        "tagProperty": "/properties/Tags"
     },
     "properties": {
         "Authentication": {
             "$ref": "#/definitions/RelayAuthentication"
         },
-        "RelayARN": {
+        "RelayArn": {
             "type": "string"
         },
         "RelayId": {
@@ -101,13 +85,13 @@
             "type": "string",
             "maxLength": 100,
             "minLength": 1,
-            "pattern": "^[\\x21-\\x7e]+$"
+            "pattern": "^[a-zA-Z0-9-_]+$"
         },
         "ServerName": {
             "type": "string",
             "maxLength": 100,
             "minLength": 1,
-            "pattern": "^[\\x21-\\x7e]+$"
+            "pattern": "^[a-zA-Z0-9-\\.]+$"
         },
         "ServerPort": {
             "type": "number",
@@ -129,15 +113,8 @@
         "ServerPort"
     ],
     "readOnlyProperties": [
-        "/properties/RelayARN",
+        "/properties/RelayArn",
         "/properties/RelayId"
-    ],
-    "createOnlyProperties": [
-        "/properties/Tags"
-    ],
-    "writeOnlyProperties": [
-        "/properties/Authentication",
-        "/properties/Tags"
     ],
     "primaryIdentifier": [
         "/properties/RelayId"
@@ -145,17 +122,23 @@
     "handlers": {
         "create": {
             "permissions": [
+                "ses:TagResource",
+                "ses:ListTagsForResource",
                 "ses:GetRelay",
                 "ses:CreateRelay"
             ]
         },
         "read": {
             "permissions": [
+                "ses:ListTagsForResource",
                 "ses:GetRelay"
             ]
         },
         "update": {
             "permissions": [
+                "ses:TagResource",
+                "ses:UntagResource",
+                "ses:ListTagsForResource",
                 "ses:GetRelay",
                 "ses:UpdateRelay"
             ]

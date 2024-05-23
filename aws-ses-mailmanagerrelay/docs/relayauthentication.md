@@ -8,32 +8,34 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 
 <pre>
 {
-    "<a href="#passwordauthentication" title="PasswordAuthentication">PasswordAuthentication</a>" : <i><a href="relaypasswordauthentication.md">RelayPasswordAuthentication</a></i>,
-    "<a href="#secretarn" title="SecretArn">SecretArn</a>" : <i>String</i>
+    "<a href="#secretarn" title="SecretArn">SecretArn</a>" : <i>String</i>,
+    "<a href="#noauthentication" title="NoAuthentication">NoAuthentication</a>" : <i>Map</i>
 }
 </pre>
 
 ### YAML
 
 <pre>
-<a href="#passwordauthentication" title="PasswordAuthentication">PasswordAuthentication</a>: <i><a href="relaypasswordauthentication.md">RelayPasswordAuthentication</a></i>
 <a href="#secretarn" title="SecretArn">SecretArn</a>: <i>String</i>
+<a href="#noauthentication" title="NoAuthentication">NoAuthentication</a>: <i>Map</i>
 </pre>
 
 ## Properties
-
-#### PasswordAuthentication
-
-_Required_: Yes
-
-_Type_: <a href="relaypasswordauthentication.md">RelayPasswordAuthentication</a>
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### SecretArn
 
 _Required_: Yes
 
 _Type_: String
+
+_Pattern_: <code>^arn:(aws|aws-cn|aws-us-gov):secretsmanager:[a-z0-9-]+:\d{12}:secret:[a-zA-Z0-9/_+=,.@-]+$</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### NoAuthentication
+
+_Required_: Yes
+
+_Type_: Map
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)

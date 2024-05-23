@@ -4,6 +4,7 @@ import software.amazon.awssdk.services.mailmanager.model.CreateRelayResponse;
 import software.amazon.awssdk.services.mailmanager.model.DeleteRelayResponse;
 import software.amazon.awssdk.services.mailmanager.model.GetRelayResponse;
 import software.amazon.awssdk.services.mailmanager.model.ListRelaysResponse;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceResponse;
 import software.amazon.awssdk.services.mailmanager.model.RelayAuthentication;
 import software.amazon.awssdk.services.mailmanager.model.Relay;
 import software.amazon.awssdk.services.mailmanager.model.UpdateRelayResponse;
@@ -23,7 +24,7 @@ public class HandlerHelper {
         return GetRelayResponse.builder()
                 .relayId(RELAY_ID)
                 .relayName(RELAY_NAME)
-                .relayARN(RELAY_ARN)
+                .relayArn(RELAY_ARN)
                 .serverName(RELAY_SERVICE_NAME)
                 .serverPort(RELAY_SERVICE_PORT)
                 .authentication(RelayAuthentication.builder()
@@ -52,5 +53,20 @@ public class HandlerHelper {
                 Relay.builder().relayId("id_one").build(),
                 Relay.builder().relayId("id_two").build()
         ).build();
+    }
+
+    static ListTagsForResourceResponse fakeListTagsForResourceResponse() {
+        return ListTagsForResourceResponse.builder()
+                .tags(
+                        software.amazon.awssdk.services.mailmanager.model.Tag.builder()
+                                .key("keyOne")
+                                .value("valueOne")
+                                .build(),
+                        software.amazon.awssdk.services.mailmanager.model.Tag.builder()
+                                .key("keyTwo")
+                                .value("valueTwo")
+                                .build()
+                )
+                .build();
     }
 }

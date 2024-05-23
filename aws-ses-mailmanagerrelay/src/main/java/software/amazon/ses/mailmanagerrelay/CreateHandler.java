@@ -42,11 +42,10 @@ public class CreateHandler extends BaseHandlerStd {
                 .then(progress ->
                         proxy.initiate("AWS-SES-MailManagerRelay::Create", proxyClient, model, callbackContext)
                                 .translateToServiceRequest(Translator::translateToCreateRequest)
-                                .makeServiceCall(
-                                        (createRelayRequest, _proxyClient)
-                                                -> createResource(createRelayRequest, _proxyClient, model, clientRequestToken))
-                                .handleError((createRelayRequest, exception, _proxyClient, _resourceModel, _callbackContext) ->
-                                        handleError(exception, _resourceModel, _callbackContext, logger, clientRequestToken))
+                                .makeServiceCall((createRelayRequest, _proxyClient)
+                                        -> createResource(createRelayRequest, _proxyClient, model, clientRequestToken))
+                                .handleError((createRelayRequest, exception, _proxyClient, _resourceModel, _callbackContext)
+                                        -> handleError(exception, _resourceModel, _callbackContext, logger, clientRequestToken))
                                 .progress()
                 )
                 .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));

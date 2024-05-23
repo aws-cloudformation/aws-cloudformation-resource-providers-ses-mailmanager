@@ -6,6 +6,7 @@ import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.ConflictException;
 import software.amazon.awssdk.services.mailmanager.model.CreateRelayRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetRelayRequest;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
@@ -34,6 +35,7 @@ import static software.amazon.ses.mailmanagerrelay.HandlerHelper.RELAY_SERVICE_N
 import static software.amazon.ses.mailmanagerrelay.HandlerHelper.RELAY_SERVICE_PORT;
 import static software.amazon.ses.mailmanagerrelay.HandlerHelper.fakeCreateRelayResponse;
 import static software.amazon.ses.mailmanagerrelay.HandlerHelper.fakeGetRelayResponse;
+import static software.amazon.ses.mailmanagerrelay.HandlerHelper.fakeListTagsForResourceResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
@@ -74,11 +76,12 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .build();
+                .desiredResourceState(model)
+                .build();
 
         when(mailManagerClient.createRelay(any(CreateRelayRequest.class))).thenReturn(fakeCreateRelayResponse());
         when(mailManagerClient.getRelay(any(GetRelayRequest.class))).thenReturn(fakeGetRelayResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -86,11 +89,14 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModel().getRelayId()).isNotNull();
-        assertThat(response.getResourceModel().getRelayARN()).isNotNull();
+        assertThat(response.getResourceModel().getRelayArn()).isNotNull();
         assertThat(response.getResourceModel().getRelayName()).isEqualTo(request.getDesiredResourceState().getRelayName());
         assertThat(response.getResourceModel().getServerName()).isEqualTo(request.getDesiredResourceState().getServerName());
         assertThat(response.getResourceModel().getServerPort()).isEqualTo(request.getDesiredResourceState().getServerPort());
-        assertThat(response.getResourceModel().getAuthentication()).isNull();
+        assertThat(response.getResourceModel().getAuthentication()).isNotNull();
+        assertThat(response.getResourceModel().getAuthentication().getSecretArn()).isEqualTo(RELAY_SECRET_ARN);
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
@@ -116,6 +122,7 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         when(mailManagerClient.createRelay(any(CreateRelayRequest.class))).thenReturn(fakeCreateRelayResponse());
         when(mailManagerClient.getRelay(any(GetRelayRequest.class))).thenReturn(fakeGetRelayResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
@@ -123,11 +130,14 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModel().getRelayId()).isNotNull();
-        assertThat(response.getResourceModel().getRelayARN()).isNotNull();
+        assertThat(response.getResourceModel().getRelayArn()).isNotNull();
         assertThat(response.getResourceModel().getRelayName()).isNotNull();
         assertThat(response.getResourceModel().getServerName()).isEqualTo(request.getDesiredResourceState().getServerName());
         assertThat(response.getResourceModel().getServerPort()).isEqualTo(request.getDesiredResourceState().getServerPort());
-        assertThat(response.getResourceModel().getAuthentication()).isNull();
+        assertThat(response.getResourceModel().getAuthentication()).isNotNull();
+        assertThat(response.getResourceModel().getAuthentication().getSecretArn()).isEqualTo(RELAY_SECRET_ARN);
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();

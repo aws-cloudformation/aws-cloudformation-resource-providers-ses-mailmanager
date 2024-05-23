@@ -34,6 +34,9 @@ Resources:
                 - "ses:DeleteRelay"
                 - "ses:GetRelay"
                 - "ses:ListRelays"
+                - "ses:ListTagsForResource"
+                - "ses:TagResource"
+                - "ses:UntagResource"
                 - "ses:UpdateRelay"
                 Resource: "*"
 Outputs:

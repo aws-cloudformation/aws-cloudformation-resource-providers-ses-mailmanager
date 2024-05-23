@@ -4,7 +4,10 @@ import java.time.Duration;
 
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.GetRelayRequest;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.HandlerErrorCode;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
@@ -24,7 +27,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static software.amazon.ses.mailmanagerrelay.HandlerHelper.RELAY_ID;
+import static software.amazon.ses.mailmanagerrelay.HandlerHelper.RELAY_SECRET_ARN;
 import static software.amazon.ses.mailmanagerrelay.HandlerHelper.fakeGetRelayResponse;
+import static software.amazon.ses.mailmanagerrelay.HandlerHelper.fakeListTagsForResourceResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadHandlerTest extends AbstractTestBase {
@@ -60,11 +65,11 @@ public class ReadHandlerTest extends AbstractTestBase {
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .build();
+                .desiredResourceState(model)
+                .build();
 
         when(mailManagerClient.getRelay(any(GetRelayRequest.class))).thenReturn(fakeGetRelayResponse());
-
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
@@ -72,10 +77,13 @@ public class ReadHandlerTest extends AbstractTestBase {
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModel().getRelayName()).isNotNull();
         assertThat(response.getResourceModel().getRelayId()).isEqualTo(request.getDesiredResourceState().getRelayId());
-        assertThat(response.getResourceModel().getRelayARN()).isNotNull();
+        assertThat(response.getResourceModel().getRelayArn()).isNotNull();
         assertThat(response.getResourceModel().getServerName()).isNotNull();
         assertThat(response.getResourceModel().getServerPort()).isNotNull();
-        assertThat(response.getResourceModel().getAuthentication()).isNull();
+        assertThat(response.getResourceModel().getAuthentication()).isNotNull();
+        assertThat(response.getResourceModel().getAuthentication().getSecretArn()).isEqualTo(RELAY_SECRET_ARN);
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
@@ -93,21 +101,16 @@ public class ReadHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        when(mailManagerClient.getRelay(any(GetRelayRequest.class))).thenReturn(fakeGetRelayResponse());
+        when(mailManagerClient.getRelay(any(GetRelayRequest.class))).thenThrow(ResourceNotFoundException.builder().message("resource not found").build());
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
-        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.FAILED);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
-        assertThat(response.getResourceModel().getRelayName()).isNotNull();
-        assertThat(response.getResourceModel().getRelayId()).isEqualTo(request.getDesiredResourceState().getRelayId());
-        assertThat(response.getResourceModel().getRelayARN()).isNotNull();
-        assertThat(response.getResourceModel().getServerName()).isNotNull();
-        assertThat(response.getResourceModel().getServerPort()).isNotNull();
-        assertThat(response.getResourceModel().getAuthentication()).isNull();
+        assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
         assertThat(response.getResourceModels()).isNull();
-        assertThat(response.getMessage()).isNull();
-        assertThat(response.getErrorCode()).isNull();
+        assertThat(response.getMessage()).isEqualTo("resource not found");
+        assertThat(response.getErrorCode()).isEqualTo(HandlerErrorCode.NotFound);
     }
 }

@@ -1,12 +1,14 @@
 package software.amazon.ses.mailmanagerrelay;
 
-import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.services.mailmanager.model.CreateRelayRequest;
 import software.amazon.awssdk.services.mailmanager.model.DeleteRelayRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetRelayRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetRelayResponse;
 import software.amazon.awssdk.services.mailmanager.model.ListRelaysRequest;
 import software.amazon.awssdk.services.mailmanager.model.ListRelaysResponse;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.TagResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.UntagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UpdateRelayRequest;
 
 import java.util.Collection;
@@ -17,7 +19,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static software.amazon.ses.mailmanagerrelay.TagHelper.convertToSet;
+import static software.amazon.ses.mailmanagerrelay.utils.RelayAuthConvertorFromSdk.ConvertFromSdk;
 import static software.amazon.ses.mailmanagerrelay.utils.RelayAuthConvertorToSdk.ConvertToSdk;
+import static software.amazon.ses.mailmanagerrelay.utils.TagsConvertor.convertToSdk;
 
 public class Translator {
 
@@ -33,6 +38,7 @@ public class Translator {
                 .relayName(model.getRelayName())
                 .serverName(model.getServerName())
                 .serverPort(model.getServerPort().intValue())
+                .tags(convertToSdk(model.getTags()))
                 .build();
     }
 
@@ -58,9 +64,10 @@ public class Translator {
         return ResourceModel.builder()
                 .relayId(response.relayId())
                 .relayName(response.relayName())
-                .relayARN(response.relayARN())
+                .relayArn(response.relayArn())
                 .serverName(response.serverName())
                 .serverPort(response.serverPort().doubleValue())
+                .authentication(ConvertFromSdk(response.authentication()))
                 .build();
     }
 
@@ -105,6 +112,18 @@ public class Translator {
     }
 
     /**
+     * Request the list of resource's tags
+     *
+     * @param model resource model
+     * @return awsRequest the aws service request to list resources within aws account
+     */
+    static ListTagsForResourceRequest translateToListTagsForResourceRequest(final ResourceModel model) {
+        return ListTagsForResourceRequest.builder()
+                .resourceArn(model.getRelayArn())
+                .build();
+    }
+
+    /**
      * Translates resource objects from sdk into a resource model (primary identifier only)
      *
      * @param response the aws service describe resource response
@@ -131,11 +150,11 @@ public class Translator {
      * @param model resource model
      * @return awsRequest the aws service request to create a resource
      */
-    static AwsRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
-        final AwsRequest awsRequest = null;
-        // TODO: construct a request
-        // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-        return awsRequest;
+    static TagResourceRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
+        return TagResourceRequest.builder()
+                .resourceArn(model.getRelayArn())
+                .tags(convertToSet(addedTags))
+                .build();
     }
 
     /**
@@ -144,10 +163,10 @@ public class Translator {
      * @param model resource model
      * @return awsRequest the aws service request to create a resource
      */
-    static AwsRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
-        final AwsRequest awsRequest = null;
-        // TODO: construct a request
-        // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-        return awsRequest;
+    static UntagResourceRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
+        return UntagResourceRequest.builder()
+                .resourceArn(model.getRelayArn())
+                .tagKeys(removedTags)
+                .build();
     }
 }
