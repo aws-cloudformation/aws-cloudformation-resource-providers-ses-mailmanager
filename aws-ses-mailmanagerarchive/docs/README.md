@@ -14,7 +14,6 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#archivename" title="ArchiveName">ArchiveName</a>" : <i>String</i>,
         "<a href="#kmskeyarn" title="KmsKeyArn">KmsKeyArn</a>" : <i>String</i>,
-        "<a href="#messageretentionperioddays" title="MessageRetentionPeriodDays">MessageRetentionPeriodDays</a>" : <i>Double</i>,
         "<a href="#retention" title="Retention">Retention</a>" : <i><a href="archiveretention.md">ArchiveRetention</a></i>,
         "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>
     }
@@ -28,7 +27,6 @@ Type: AWS::SES::MailManagerArchive
 Properties:
     <a href="#archivename" title="ArchiveName">ArchiveName</a>: <i>String</i>
     <a href="#kmskeyarn" title="KmsKeyArn">KmsKeyArn</a>: <i>String</i>
-    <a href="#messageretentionperioddays" title="MessageRetentionPeriodDays">MessageRetentionPeriodDays</a>: <i>Double</i>
     <a href="#retention" title="Retention">Retention</a>: <i><a href="archiveretention.md">ArchiveRetention</a></i>
     <a href="#tags" title="Tags">Tags</a>: <i>
       - <a href="tag.md">Tag</a></i>
@@ -60,14 +58,6 @@ _Pattern_: <code>^arn:aws(|-cn|-us-gov):kms:[a-z0-9-]{1,20}:[0-9]{12}:(key|alias
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
-#### MessageRetentionPeriodDays
-
-_Required_: No
-
-_Type_: Double
-
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
-
 #### Retention
 
 _Required_: No
@@ -82,7 +72,7 @@ _Required_: No
 
 _Type_: List of <a href="tag.md">Tag</a>
 
-_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 ## Return Values
 

@@ -6,6 +6,7 @@ import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.ConflictException;
 import software.amazon.awssdk.services.mailmanager.model.CreateArchiveRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetArchiveRequest;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.RetentionPeriod;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
@@ -31,19 +32,19 @@ import static software.amazon.ses.mailmanagerarchive.HandlerHelper.ARCHIVE_KMS_A
 import static software.amazon.ses.mailmanagerarchive.HandlerHelper.ARCHIVE_NAME;
 import static software.amazon.ses.mailmanagerarchive.HandlerHelper.CLIENT_REQUEST_TOKEN;
 import static software.amazon.ses.mailmanagerarchive.HandlerHelper.LOGICAL_RESOURCE_ID;
-import static software.amazon.ses.mailmanagerarchive.HandlerHelper.MESSAGE_RETENTION_PERIOD_DAYS;
 import static software.amazon.ses.mailmanagerarchive.HandlerHelper.fakeCreateArchiveResponse;
 import static software.amazon.ses.mailmanagerarchive.HandlerHelper.fakeGetArchiveResponse;
+import static software.amazon.ses.mailmanagerarchive.HandlerHelper.fakeListTagsForResourceResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
 
     @Mock
-    MailManagerClient mailManagerClient;
-    @Mock
     private AmazonWebServicesClientProxy proxy;
     @Mock
     private ProxyClient<MailManagerClient> proxyClient;
+    @Mock
+    MailManagerClient mailManagerClient;
 
     @BeforeEach
     public void setup() {
@@ -63,11 +64,11 @@ public class CreateHandlerTest extends AbstractTestBase {
         final CreateHandler handler = new CreateHandler();
 
         final ResourceModel model = ResourceModel.builder()
+                .archiveName(ARCHIVE_NAME)
                 .retention(ArchiveRetention.builder()
                         .retentionPeriod(RetentionPeriod.FIVE_YEARS.toString())
                         .build())
                 .kmsKeyArn(ARCHIVE_KMS_ARN)
-                .messageRetentionPeriodDays(MESSAGE_RETENTION_PERIOD_DAYS.doubleValue())
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
@@ -78,11 +79,51 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         when(mailManagerClient.createArchive(any(CreateArchiveRequest.class))).thenReturn(fakeCreateArchiveResponse());
         when(mailManagerClient.getArchive(any(GetArchiveRequest.class))).thenReturn(fakeGetArchiveResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
-        assertThat(response.getResourceModel().getKmsKeyArn()).isNull();
+        assertThat(response.getResourceModel().getKmsKeyArn()).isEqualTo(ARCHIVE_KMS_ARN);
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel().getArchiveId()).isNotNull();
+        assertThat(response.getResourceModel().getArchiveName()).isEqualTo(ARCHIVE_NAME);
+        assertThat(response.getResourceModel().getArchiveState()).isNotNull();
+        assertThat(response.getResourceModel().getArchiveArn()).isNotNull();
+        assertThat(response.getResourceModel().getRetention()).isEqualTo(request.getDesiredResourceState().getRetention());
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handle_request_simple_success_without_name() {
+        final CreateHandler handler = new CreateHandler();
+
+        final ResourceModel model = ResourceModel.builder()
+                .retention(ArchiveRetention.builder()
+                        .retentionPeriod(RetentionPeriod.FIVE_YEARS.toString())
+                        .build())
+                .kmsKeyArn(ARCHIVE_KMS_ARN)
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .clientRequestToken(CLIENT_REQUEST_TOKEN)
+                .logicalResourceIdentifier(LOGICAL_RESOURCE_ID)
+                .build();
+
+        when(mailManagerClient.createArchive(any(CreateArchiveRequest.class))).thenReturn(fakeCreateArchiveResponse());
+        when(mailManagerClient.getArchive(any(GetArchiveRequest.class))).thenReturn(fakeGetArchiveResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getResourceModel().getKmsKeyArn()).isEqualTo(ARCHIVE_KMS_ARN);
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModel().getArchiveId()).isNotNull();
@@ -90,7 +131,8 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModel().getArchiveState()).isNotNull();
         assertThat(response.getResourceModel().getArchiveArn()).isNotNull();
         assertThat(response.getResourceModel().getRetention()).isEqualTo(request.getDesiredResourceState().getRetention());
-        assertThat(response.getResourceModel().getMessageRetentionPeriodDays()).isEqualTo(request.getDesiredResourceState().getMessageRetentionPeriodDays());
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();

@@ -62,8 +62,9 @@ public class CreateHandler extends BaseHandlerStd {
 
         logger.log(String.format("[ClientRequestToken: %s] Archive with name <%s> is created and ID has been assigned with <%s>", clientRequestToken, model.getArchiveName(), response.archiveId()));
 
-        // Assign archiveId as primaryIdentifier
-        model.setArchiveId(response.archiveId());
+        if (model.getArchiveId() == null) {
+            model.setArchiveId(response.archiveId());
+        }
 
         return response;
     }
