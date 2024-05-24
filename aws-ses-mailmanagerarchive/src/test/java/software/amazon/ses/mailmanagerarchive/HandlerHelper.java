@@ -7,6 +7,7 @@ import software.amazon.awssdk.services.mailmanager.model.DeleteArchiveResponse;
 import software.amazon.awssdk.services.mailmanager.model.GetArchiveResponse;
 import software.amazon.awssdk.services.mailmanager.model.ListArchivesResponse;
 import software.amazon.awssdk.services.mailmanager.model.Archive;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceResponse;
 import software.amazon.awssdk.services.mailmanager.model.RetentionPeriod;
 import software.amazon.awssdk.services.mailmanager.model.UpdateArchiveResponse;
 
@@ -16,7 +17,6 @@ public class HandlerHelper {
     public static final String ARCHIVE_NAME = "archive_name";
     public static final String ARCHIVE_ARN = "archive_arn";
     public static final String ARCHIVE_KMS_ARN = "archive_kms_arn";
-    public static final Integer MESSAGE_RETENTION_PERIOD_DAYS = 10;
     public static final String CLIENT_REQUEST_TOKEN = "client_request_token";
     public static final String LOGICAL_RESOURCE_ID = "logical_resource_id";
 
@@ -26,7 +26,6 @@ public class HandlerHelper {
                 .archiveArn(ARCHIVE_ARN)
                 .archiveName(ARCHIVE_NAME)
                 .archiveState(ArchiveState.ACTIVE)
-                .messageRetentionPeriodDays(MESSAGE_RETENTION_PERIOD_DAYS)
                 .retention(ArchiveRetention.builder()
                         .retentionPeriod(RetentionPeriod.FIVE_YEARS)
                         .build())
@@ -40,7 +39,6 @@ public class HandlerHelper {
                 .archiveArn(ARCHIVE_ARN)
                 .archiveName(ARCHIVE_NAME)
                 .archiveState(ArchiveState.PENDING_DELETION)
-                .messageRetentionPeriodDays(MESSAGE_RETENTION_PERIOD_DAYS)
                 .retention(ArchiveRetention.builder()
                         .retentionPeriod(RetentionPeriod.FIVE_YEARS)
                         .build())
@@ -51,6 +49,21 @@ public class HandlerHelper {
     static CreateArchiveResponse fakeCreateArchiveResponse() {
         return CreateArchiveResponse.builder()
                 .archiveId(ARCHIVE_ID)
+                .build();
+    }
+
+    static ListTagsForResourceResponse fakeListTagsForResourceResponse() {
+        return ListTagsForResourceResponse.builder()
+                .tags(
+                        software.amazon.awssdk.services.mailmanager.model.Tag.builder()
+                                .key("keyOne")
+                                .value("valueOne")
+                                .build(),
+                        software.amazon.awssdk.services.mailmanager.model.Tag.builder()
+                                .key("keyTwo")
+                                .value("valueTwo")
+                                .build()
+                )
                 .build();
     }
 

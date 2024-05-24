@@ -77,7 +77,7 @@
         },
         "ArchiveId": {
             "type": "string",
-            "maxLength": 20,
+            "maxLength": 66,
             "minLength": 1
         },
         "ArchiveName": {
@@ -93,11 +93,6 @@
             "type": "string",
             "pattern": "^arn:aws(|-cn|-us-gov):kms:[a-z0-9-]{1,20}:[0-9]{12}:(key|alias)/.+$"
         },
-        "MessageRetentionPeriodDays": {
-            "type": "number",
-            "maximum": 3650,
-            "minimum": -1
-        },
         "Retention": {
             "$ref": "#/definitions/ArchiveRetention"
         },
@@ -111,10 +106,10 @@
         }
     },
     "tagging": {
-        "taggable": false,
-        "tagOnCreate": false,
-        "tagUpdatable": false,
-        "cloudFormationSystemTags": false,
+        "taggable": true,
+        "tagOnCreate": true,
+        "tagUpdatable": true,
+        "cloudFormationSystemTags": true,
         "tagProperty": "/properties/Tags"
     },
     "readOnlyProperties": [
@@ -122,12 +117,7 @@
         "/properties/ArchiveId",
         "/properties/ArchiveState"
     ],
-    "writeOnlyProperties": [
-        "/properties/Tags",
-        "/properties/KmsKeyArn"
-    ],
     "createOnlyProperties": [
-        "/properties/Tags",
         "/properties/KmsKeyArn"
     ],
     "primaryIdentifier": [
@@ -136,17 +126,26 @@
     "handlers": {
         "create": {
             "permissions": [
+                "ses:TagResource",
+                "ses:ListTagsForResource",
                 "ses:GetArchive",
-                "ses:CreateArchive"
+                "ses:CreateArchive",
+                "kms:DescribeKey",
+                "kms:Decrypt",
+                "kms:GenerateDataKey"
             ]
         },
         "read": {
             "permissions": [
+                "ses:ListTagsForResource",
                 "ses:GetArchive"
             ]
         },
         "update": {
             "permissions": [
+                "ses:TagResource",
+                "ses:UntagResource",
+                "ses:ListTagsForResource",
                 "ses:GetArchive",
                 "ses:UpdateArchive"
             ]

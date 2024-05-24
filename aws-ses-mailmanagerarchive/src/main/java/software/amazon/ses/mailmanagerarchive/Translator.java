@@ -1,6 +1,5 @@
 package software.amazon.ses.mailmanagerarchive;
 
-import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.services.mailmanager.model.ArchiveState;
 import software.amazon.awssdk.services.mailmanager.model.CreateArchiveRequest;
 import software.amazon.awssdk.services.mailmanager.model.DeleteArchiveRequest;
@@ -8,6 +7,9 @@ import software.amazon.awssdk.services.mailmanager.model.GetArchiveRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetArchiveResponse;
 import software.amazon.awssdk.services.mailmanager.model.ListArchivesRequest;
 import software.amazon.awssdk.services.mailmanager.model.ListArchivesResponse;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.TagResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.UntagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UpdateArchiveRequest;
 import software.amazon.ses.mailmanagerarchive.utils.ArchiveConvertorFromSdk;
 import software.amazon.ses.mailmanagerarchive.utils.ArchiveConvertorToSdk;
@@ -19,6 +21,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static software.amazon.ses.mailmanagerarchive.TagHelper.convertToSet;
+import static software.amazon.ses.mailmanagerarchive.utils.TagsConvertor.convertToSdk;
 
 
 public class Translator {
@@ -33,11 +38,8 @@ public class Translator {
         return CreateArchiveRequest.builder()
                 .archiveName(model.getArchiveName())
                 .retention(ArchiveConvertorToSdk.convertToSdk(model.getRetention()))
-                .messageRetentionPeriodDays(
-                        model.getMessageRetentionPeriodDays() == null ?
-                                null : model.getMessageRetentionPeriodDays().intValue()
-                )
                 .kmsKeyArn(model.getKmsKeyArn())
+                .tags(convertToSdk(model.getTags()))
                 .build();
     }
 
@@ -66,7 +68,7 @@ public class Translator {
                 .archiveState(response.archiveStateAsString())
                 .archiveArn(response.archiveArn())
                 .retention(ArchiveConvertorFromSdk.convertFromSdk(response.retention()))
-                .messageRetentionPeriodDays(response.messageRetentionPeriodDays().doubleValue())
+                .kmsKeyArn(response.kmsKeyArn())
                 .build();
     }
 
@@ -93,10 +95,6 @@ public class Translator {
                 .archiveId(model.getArchiveId())
                 .archiveName(model.getArchiveName())
                 .retention(ArchiveConvertorToSdk.convertToSdk(model.getRetention()))
-                .messageRetentionPeriodDays(
-                        model.getMessageRetentionPeriodDays() == null ?
-                                null : model.getMessageRetentionPeriodDays().intValue()
-                )
                 .build();
     }
 
@@ -109,6 +107,18 @@ public class Translator {
     static ListArchivesRequest translateToListRequest(final String nextToken) {
         return ListArchivesRequest.builder()
                 .nextToken(nextToken)
+                .build();
+    }
+
+    /**
+     * Request the list of resource's tags
+     *
+     * @param model resource model
+     * @return awsRequest the aws service request to list resources within aws account
+     */
+    static ListTagsForResourceRequest translateToListTagsForResourceRequest(final ResourceModel model) {
+        return ListTagsForResourceRequest.builder()
+                .resourceArn(model.getArchiveArn())
                 .build();
     }
 
@@ -140,11 +150,11 @@ public class Translator {
      * @param model resource model
      * @return awsRequest the aws service request to create a resource
      */
-    static AwsRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
-        final AwsRequest awsRequest = null;
-        // TODO: construct a request
-        // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-        return awsRequest;
+    static TagResourceRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
+        return TagResourceRequest.builder()
+                .resourceArn(model.getArchiveArn())
+                .tags(convertToSet(addedTags))
+                .build();
     }
 
     /**
@@ -153,10 +163,10 @@ public class Translator {
      * @param model resource model
      * @return awsRequest the aws service request to create a resource
      */
-    static AwsRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
-        final AwsRequest awsRequest = null;
-        // TODO: construct a request
-        // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-        return awsRequest;
+    static UntagResourceRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
+        return UntagResourceRequest.builder()
+                .resourceArn(model.getArchiveArn())
+                .tagKeys(removedTags)
+                .build();
     }
 }

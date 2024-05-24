@@ -30,10 +30,16 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                - "kms:Decrypt"
+                - "kms:DescribeKey"
+                - "kms:GenerateDataKey"
                 - "ses:CreateArchive"
                 - "ses:DeleteArchive"
                 - "ses:GetArchive"
                 - "ses:ListArchives"
+                - "ses:ListTagsForResource"
+                - "ses:TagResource"
+                - "ses:UntagResource"
                 - "ses:UpdateArchive"
                 Resource: "*"
 Outputs:

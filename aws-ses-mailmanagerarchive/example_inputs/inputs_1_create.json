@@ -1,7 +1,6 @@
 {
     "ArchiveName": "archive_name",
     "KmsKeyArn": "kms_key_arn",
-    "MessageRetentionPeriodDays": 10.0,
     "Retention": {
         "RetentionPeriod": "FIVE_YEARS"
     }

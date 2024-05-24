@@ -4,6 +4,7 @@ import java.time.Duration;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.ArchiveState;
 import software.amazon.awssdk.services.mailmanager.model.GetArchiveRequest;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.HandlerErrorCode;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.when;
 import static software.amazon.ses.mailmanagerarchive.HandlerHelper.ARCHIVE_ID;
 import static software.amazon.ses.mailmanagerarchive.HandlerHelper.fakeGetArchiveResponse;
 import static software.amazon.ses.mailmanagerarchive.HandlerHelper.fakeGetDeletedArchiveResponse;
+import static software.amazon.ses.mailmanagerarchive.HandlerHelper.fakeListTagsForResourceResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadHandlerTest extends AbstractTestBase {
@@ -63,11 +65,11 @@ public class ReadHandlerTest extends AbstractTestBase {
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .build();
+                .desiredResourceState(model)
+                .build();
 
         when(mailManagerClient.getArchive(any(GetArchiveRequest.class))).thenReturn(fakeGetArchiveResponse());
-
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
@@ -77,6 +79,8 @@ public class ReadHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModel().getArchiveName()).isNotNull();
         assertThat(response.getResourceModel().getArchiveId()).isEqualTo(request.getDesiredResourceState().getArchiveId());
         assertThat(response.getResourceModel().getArchiveState()).isEqualTo(ArchiveState.ACTIVE.toString());
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
