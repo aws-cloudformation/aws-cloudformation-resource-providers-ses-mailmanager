@@ -1,8 +1,14 @@
 package software.amazon.ses.mailmanageraddonsubscription;
 
-import com.google.common.collect.Lists;
-import software.amazon.awssdk.awscore.AwsRequest;
-import software.amazon.awssdk.awscore.AwsResponse;
+import software.amazon.awssdk.services.mailmanager.model.CreateAddonSubscriptionRequest;
+import software.amazon.awssdk.services.mailmanager.model.DeleteAddonSubscriptionRequest;
+import software.amazon.awssdk.services.mailmanager.model.GetAddonSubscriptionRequest;
+import software.amazon.awssdk.services.mailmanager.model.GetAddonSubscriptionResponse;
+import software.amazon.awssdk.services.mailmanager.model.ListAddonSubscriptionsRequest;
+import software.amazon.awssdk.services.mailmanager.model.ListAddonSubscriptionsResponse;
+import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.TagResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.UntagResourceRequest;
 
 import java.util.Collection;
 import java.util.List;
@@ -12,139 +18,137 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static software.amazon.ses.mailmanageraddonsubscription.TagHelper.convertToSet;
+import static software.amazon.ses.mailmanageraddonsubscription.utils.TagsConvertor.convertToSdk;
+
 /**
  * This class is a centralized placeholder for
- *  - api request construction
- *  - object translation to/from aws sdk
- *  - resource model construction for read/list handlers
+ * - api request construction
+ * - object translation to/from aws sdk
+ * - resource model construction for read/list handlers
  */
 
 public class Translator {
 
   /**
    * Request to create a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest translateToCreateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static CreateAddonSubscriptionRequest translateToCreateRequest(final ResourceModel model) {
+    return CreateAddonSubscriptionRequest.builder()
+            .addonName(model.getAddonName())
+            .tags(convertToSdk(model.getTags()))
+            .build();
   }
 
   /**
    * Request to read a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to describe a resource
    */
-  static AwsRequest translateToReadRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L20-L24
-    return awsRequest;
+  static GetAddonSubscriptionRequest translateToReadRequest(final ResourceModel model) {
+    return GetAddonSubscriptionRequest.builder()
+            .addonSubscriptionId(model.getAddonSubscriptionId())
+            .build();
   }
 
   /**
    * Translates resource object from sdk into a resource model
-   * @param awsResponse the aws service describe resource response
+   *
+   * @param response the aws service describe resource response
    * @return model resource model
    */
-  static ResourceModel translateFromReadResponse(final AwsResponse awsResponse) {
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L58-L73
+  static ResourceModel translateFromReadResponse(final GetAddonSubscriptionResponse response, String resourceId) {
     return ResourceModel.builder()
-        //.someProperty(response.property())
-        .build();
+            .addonSubscriptionId(resourceId)
+            .addonName(response.addonName())
+            .addonSubscriptionArn(response.addonSubscriptionArn())
+            .build();
   }
 
   /**
    * Request to delete a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to delete a resource
    */
-  static AwsRequest translateToDeleteRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L33-L37
-    return awsRequest;
-  }
-
-  /**
-   * Request to update properties of a previously created resource
-   * @param model resource model
-   * @return awsRequest the aws service request to modify a resource
-   */
-  static AwsRequest translateToFirstUpdateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L45-L50
-    return awsRequest;
-  }
-
-  /**
-   * Request to update some other properties that could not be provisioned through first update request
-   * @param model resource model
-   * @return awsRequest the aws service request to modify a resource
-   */
-  static AwsRequest translateToSecondUpdateRequest(final ResourceModel model) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    return awsRequest;
+  static DeleteAddonSubscriptionRequest translateToDeleteRequest(final ResourceModel model) {
+    return DeleteAddonSubscriptionRequest.builder()
+            .addonSubscriptionId(model.getAddonSubscriptionId())
+            .build();
   }
 
   /**
    * Request to list resources
+   *
    * @param nextToken token passed to the aws service list resources request
    * @return awsRequest the aws service request to list resources within aws account
    */
-  static AwsRequest translateToListRequest(final String nextToken) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L26-L31
-    return awsRequest;
+  static ListAddonSubscriptionsRequest translateToListRequest(final String nextToken) {
+    return ListAddonSubscriptionsRequest.builder()
+            .nextToken(nextToken)
+            .build();
+  }
+
+  /**
+   * Request the list of resource's tags
+   *
+   * @param model resource model
+   * @return awsRequest the aws service request to list resources within aws account
+   */
+  static ListTagsForResourceRequest translateToListTagsForResourceRequest(final ResourceModel model) {
+    return ListTagsForResourceRequest.builder()
+            .resourceArn(model.getAddonSubscriptionArn())
+            .build();
   }
 
   /**
    * Translates resource objects from sdk into a resource model (primary identifier only)
-   * @param awsResponse the aws service describe resource response
+   *
+   * @param response the aws service describe resource response
    * @return list of resource models
    */
-  static List<ResourceModel> translateFromListRequest(final AwsResponse awsResponse) {
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L75-L82
-    return streamOfOrEmpty(Lists.newArrayList())
-        .map(resource -> ResourceModel.builder()
-            // include only primary identifier
-            .build())
-        .collect(Collectors.toList());
+  static List<ResourceModel> translateFromListResponse(final ListAddonSubscriptionsResponse response) {
+    return streamOfOrEmpty(response.addonSubscriptions())
+            .map(resource -> ResourceModel.builder()
+                    // include only primary identifier
+                    .addonSubscriptionId(resource.addonSubscriptionId())
+                    .build())
+            .collect(Collectors.toList());
   }
 
   private static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
     return Optional.ofNullable(collection)
-        .map(Collection::stream)
-        .orElseGet(Stream::empty);
+            .map(Collection::stream)
+            .orElseGet(Stream::empty);
   }
 
   /**
    * Request to add tags to a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static TagResourceRequest tagResourceRequest(final ResourceModel model, final Map<String, String> addedTags) {
+    return TagResourceRequest.builder()
+            .resourceArn(model.getAddonSubscriptionArn())
+            .tags(convertToSet(addedTags))
+            .build();
   }
 
   /**
    * Request to add tags to a resource
+   *
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static AwsRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
-    final AwsRequest awsRequest = null;
-    // TODO: construct a request
-    // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/2077c92299aeb9a68ae8f4418b5e932b12a8b186/aws-logs-loggroup/src/main/java/com/aws/logs/loggroup/Translator.java#L39-L43
-    return awsRequest;
+  static UntagResourceRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
+    return UntagResourceRequest.builder()
+            .resourceArn(model.getAddonSubscriptionArn())
+            .tagKeys(removedTags)
+            .build();
   }
 }

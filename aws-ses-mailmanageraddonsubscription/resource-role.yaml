@@ -34,6 +34,9 @@ Resources:
                 - "ses:DeleteAddonSubscription"
                 - "ses:GetAddonSubscription"
                 - "ses:ListAddonSubscriptions"
+                - "ses:ListTagsForResource"
+                - "ses:TagResource"
+                - "ses:UntagResource"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:
