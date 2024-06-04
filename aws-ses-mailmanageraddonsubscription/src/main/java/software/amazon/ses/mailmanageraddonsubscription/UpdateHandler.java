@@ -1,140 +1,156 @@
 package software.amazon.ses.mailmanageraddonsubscription;
 
-// TODO: replace all usage of SdkClient with your service client type, e.g; YourServiceAsyncClient
-// import software.amazon.awssdk.services.yourservice.YourServiceAsyncClient;
 
-import software.amazon.awssdk.awscore.AwsResponse;
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
-import software.amazon.awssdk.core.SdkClient;
-import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
+import software.amazon.awssdk.services.mailmanager.MailManagerClient;
+import software.amazon.awssdk.services.mailmanager.model.GetAddonSubscriptionRequest;
+import software.amazon.awssdk.services.mailmanager.model.GetAddonSubscriptionResponse;
+import software.amazon.cloudformation.exceptions.CfnNotUpdatableException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
+import java.util.Map;
+import java.util.Set;
+
 public class UpdateHandler extends BaseHandlerStd {
     private Logger logger;
 
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
-        final AmazonWebServicesClientProxy proxy,
-        final ResourceHandlerRequest<ResourceModel> request,
-        final CallbackContext callbackContext,
-        final ProxyClient<SdkClient> proxyClient,
-        final Logger logger) {
-
+            final AmazonWebServicesClientProxy proxy,
+            final ResourceHandlerRequest<ResourceModel> request,
+            final CallbackContext callbackContext,
+            final ProxyClient<MailManagerClient> proxyClient,
+            final Logger logger
+    ) {
         this.logger = logger;
 
-        // TODO: Adjust Progress Chain according to your implementation
-        // https://github.com/aws-cloudformation/cloudformation-cli-java-plugin/blob/master/src/main/java/software/amazon/cloudformation/proxy/CallChain.java
+        final ResourceModel model = request.getDesiredResourceState();
+        final ResourceModel previousModel = request.getPreviousResourceState();
+        final String clientRequestToken = request.getClientRequestToken();
 
-        return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
+        logger.log(String.format("[ClientRequestToken: %s] Trying to update AddonSubscription's Tags with ID <%s>", clientRequestToken, model.getAddonSubscriptionId()));
 
-            // STEP 1 [check if resource already exists]
-            // for more information -> https://docs.aws.amazon.com/cloudformation-cli/latest/userguide/resource-type-test-contract.html
-            // if target API does not support 'ResourceNotFoundException' then following check is required
-            .then(progress ->
-                // STEP 1.0 [initialize a proxy context]
-                // If your service API does not return ResourceNotFoundException on update requests against some identifier (e.g; resource Name)
-                // and instead returns a 200 even though a resource does not exist, you must first check if the resource exists here
-                // NOTE: If your service API throws 'ResourceNotFoundException' for update requests this method is not necessary
-                proxy.initiate("AWS-SES-MailManagerAddonSubscription::Update::PreUpdateCheck", proxyClient, progress.getResourceModel(), progress.getCallbackContext())
+        if (!previousModel.getAddonName().equals(model.getAddonName())) {
+            throw new CfnNotUpdatableException(ResourceModel.TYPE_NAME, model.getAddonName());
+        }
 
-                    // STEP 1.1 [initialize a proxy context]
-                    .translateToServiceRequest(Translator::translateToReadRequest)
+        ProgressEvent<ResourceModel, CallbackContext> progressEvent = ProgressEvent.progress(model, callbackContext);
 
-                    // STEP 1.2 [TODO: make an api call]
-                    .makeServiceCall((awsRequest, client) -> {
-                        AwsResponse awsResponse = null;
+        if (TagHelper.shouldUpdateTags(request)) {
+            final Map<String, String> previousTags = TagHelper.getPreviouslyAttachedTags(request);
+            final Map<String, String> desiredTags = TagHelper.getNewDesiredTags(request);
+            final Map<String, String> addedTags = TagHelper.generateTagsToAdd(previousTags, desiredTags);
+            final Set<String> removedTags = TagHelper.generateTagsToRemove(previousTags, desiredTags);
 
-                        // TODO: add custom read resource logic
-                        // If describe request does not return ResourceNotFoundException, you must throw ResourceNotFoundException based on
-                        // awsResponse values
+            registerResourceArn(model, proxyClient);
 
-                        logger.log(String.format("%s has successfully been read.", ResourceModel.TYPE_NAME));
-                        return awsResponse;
-                    })
-                    .progress()
-            )
+            progressEvent = progressEvent
+                    .then(
+                            progress -> untagResource(
+                                    proxy,
+                                    proxyClient,
+                                    model,
+                                    request,
+                                    callbackContext,
+                                    clientRequestToken,
+                                    removedTags,
+                                    logger
+                            ))
+                    .then(
+                            progress -> tagResource(
+                                    proxy,
+                                    proxyClient,
+                                    model,
+                                    request,
+                                    callbackContext,
+                                    clientRequestToken,
+                                    addedTags,
+                                    logger
+                            ));
+        }
+        return progressEvent.then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+    }
 
-            // STEP 2 [first update/stabilize progress chain - required for resource update]
-            .then(progress ->
-                // STEP 2.0 [initialize a proxy context]
-                // Implement client invocation of the update request through the proxyClient, which is already initialised with
-                // caller credentials, correct region and retry settings
-                proxy.initiate("AWS-SES-MailManagerAddonSubscription::Update::first", proxyClient, progress.getResourceModel(), progress.getCallbackContext())
+    /**
+     * ReadOnlyProperties cannot be retrieved from neither DesiredResourceState nor PreviousResourceState
+     * So we need to explicitly invoke GET API to get the resource's ARN
+     */
+    private void registerResourceArn(
+            ResourceModel model,
+            ProxyClient<MailManagerClient> proxyClient
+    ) {
+        if (model.getAddonSubscriptionArn() == null) {
+            GetAddonSubscriptionRequest request = GetAddonSubscriptionRequest.builder()
+                    .addonSubscriptionId(model.getAddonSubscriptionId())
+                    .build();
 
-                    // STEP 2.1 [TODO: construct a body of a request]
-                    .translateToServiceRequest(Translator::translateToFirstUpdateRequest)
+            GetAddonSubscriptionResponse res = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::getAddonSubscription);
 
-                    // STEP 2.2 [TODO: make an api call]
-                    .makeServiceCall((awsRequest, client) -> {
-                        AwsResponse awsResponse = null;
-                        try {
+            model.setAddonSubscriptionArn(res.addonSubscriptionArn());
+        }
+    }
 
-                            // TODO: put your update resource code here
+    /**
+     * tagResource during update
+     * <p>
+     * Calls the service:TagResource API.
+     */
+    private ProgressEvent<ResourceModel, CallbackContext> tagResource(
+            final AmazonWebServicesClientProxy proxy,
+            final ProxyClient<MailManagerClient> serviceClient,
+            final ResourceModel resourceModel,
+            final ResourceHandlerRequest<ResourceModel> handlerRequest,
+            final CallbackContext callbackContext,
+            final String clientRequestToken,
+            final Map<String, String> addedTags,
+            final Logger logger
+    ) {
+        if (addedTags.isEmpty()) {
+            return ProgressEvent.progress(resourceModel, callbackContext);
+        }
 
-                        } catch (final AwsServiceException e) {
-                            /*
-                            * While the handler contract states that the handler must always return a progress event,
-                            * you may throw any instance of BaseHandlerException, as the wrapper map it to a progress event.
-                            * Each BaseHandlerException maps to a specific error code, and you should map service exceptions as closely as possible
-                            * to more specific error codes
-                            */
-                            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
-                        }
+        logger.log(String.format("[ClientRequestToken: %s] Going to add tags for AddonSubscription with ID <%s> under AccountId: <%s>",
+                clientRequestToken, resourceModel.getAddonSubscriptionId(), handlerRequest.getAwsAccountId()));
 
-                        logger.log(String.format("%s has successfully been updated.", ResourceModel.TYPE_NAME));
-                        return awsResponse;
-                    })
+        return proxy.initiate("AWS-SES-MailManagerAddonSubscription::TagResource", serviceClient, resourceModel, callbackContext)
+                .translateToServiceRequest(model -> Translator.tagResourceRequest(model, addedTags))
+                .makeServiceCall((request, client)
+                        -> proxy.injectCredentialsAndInvokeV2(request, client.client()::tagResource))
+                .handleError((tagResourceRequest, exception, _proxyClient, _resourceModel, _callbackContext)
+                        -> handleError(exception, resourceModel, callbackContext, logger, clientRequestToken))
+                .progress();
+    }
 
-                    // STEP 2.3 [TODO: stabilize step is not necessarily required but typically involves describing the resource until it is in a certain status, though it can take many forms]
-                    // stabilization step may or may not be needed after each API call
-                    // for more information -> https://docs.aws.amazon.com/cloudformation-cli/latest/userguide/resource-type-test-contract.html
-                    .stabilize((awsRequest, awsResponse, client, model, context) -> {
-                        // TODO: put your stabilization code here
+    /**
+     * untagResource during update
+     * <p>
+     * Calls the service:UntagResource API.
+     */
+    private ProgressEvent<ResourceModel, CallbackContext> untagResource(
+            final AmazonWebServicesClientProxy proxy,
+            final ProxyClient<MailManagerClient> serviceClient,
+            final ResourceModel resourceModel,
+            final ResourceHandlerRequest<ResourceModel> handlerRequest,
+            final CallbackContext callbackContext,
+            final String clientRequestToken,
+            final Set<String> removedTags,
+            final Logger logger
+    ) {
+        if (removedTags.isEmpty()) {
+            return ProgressEvent.progress(resourceModel, callbackContext);
+        }
 
-                        final boolean stabilized = true;
+        logger.log(String.format("[ClientRequestToken: %s] Going to remove tags for AddonSubscription with ID <%s> under AccountId: <%s>",
+                clientRequestToken, resourceModel.getAddonSubscriptionId(), handlerRequest.getAwsAccountId()));
 
-                        logger.log(String.format("%s [%s] update has stabilized: %s", ResourceModel.TYPE_NAME, model.getPrimaryIdentifier(), stabilized));
-                        return stabilized;
-                    })
-                    .progress())
-
-            // If your resource is provisioned through multiple API calls, then the following pattern is required (and might take as many postUpdate callbacks as necessary)
-            // STEP 3 [second update/stabilize progress chain]
-            .then(progress ->
-                    // STEP 3.0 [initialize a proxy context]
-                    // If your resource is provisioned through multiple API calls, you will need to apply each subsequent update
-                    // step in a discrete call/stabilize chain to ensure the entire resource is provisioned as intended.
-                    proxy.initiate("AWS-SES-MailManagerAddonSubscription::Update::second", proxyClient, progress.getResourceModel(), progress.getCallbackContext())
-
-                    // STEP 3.1 [TODO: construct a body of a request]
-                    .translateToServiceRequest(Translator::translateToSecondUpdateRequest)
-
-                    // STEP 3.2 [TODO: make an api call]
-                    .makeServiceCall((awsRequest, client) -> {
-                        AwsResponse awsResponse = null;
-                        try {
-
-                            // TODO: put your post update resource code here
-
-                        } catch (final AwsServiceException e) {
-                            /*
-                            * While the handler contract states that the handler must always return a progress event,
-                            * you may throw any instance of BaseHandlerException, as the wrapper map it to a progress event.
-                            * Each BaseHandlerException maps to a specific error code, and you should map service exceptions as closely as possible
-                            * to more specific error codes
-                            */
-                            throw new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
-                        }
-
-                        logger.log(String.format("%s has successfully been updated.", ResourceModel.TYPE_NAME));
-                        return awsResponse;
-                    })
-                    .progress())
-
-            // STEP 4 [TODO: describe call/chain to return the resource model]
-            .then(progress -> new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
+        return proxy.initiate("AWS-SES-MailManagerAddonSubscription::UntagResource", serviceClient, resourceModel, callbackContext)
+                .translateToServiceRequest(model -> Translator.untagResourceRequest(model, removedTags))
+                .makeServiceCall((request, client)
+                        -> proxy.injectCredentialsAndInvokeV2(request, client.client()::untagResource))
+                .handleError((untagResourceRequest, exception, _proxyClient, _resourceModel, _callbackContext)
+                        -> handleError(exception, resourceModel, callbackContext, logger, clientRequestToken))
+                .progress();
     }
 }

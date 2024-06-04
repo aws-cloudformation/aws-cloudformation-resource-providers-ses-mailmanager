@@ -51,16 +51,19 @@
     "required": [
         "AddonName"
     ],
+    "tagging": {
+        "taggable": true,
+        "tagOnCreate": true,
+        "tagUpdatable": true,
+        "cloudFormationSystemTags": true,
+        "tagProperty": "/properties/Tags"
+    },
+    "createOnlyProperties": [
+        "/properties/AddonName"
+    ],
     "readOnlyProperties": [
         "/properties/AddonSubscriptionArn",
         "/properties/AddonSubscriptionId"
-    ],
-    "writeOnlyProperties": [
-        "/properties/Tags"
-    ],
-    "createOnlyProperties": [
-        "/properties/AddonName",
-        "/properties/Tags"
     ],
     "primaryIdentifier": [
         "/properties/AddonSubscriptionId"
@@ -68,16 +71,29 @@
     "handlers": {
         "create": {
             "permissions": [
+                "ses:TagResource",
+                "ses:ListTagsForResource",
+                "ses:GetAddonSubscription",
                 "ses:CreateAddonSubscription"
             ]
         },
         "read": {
             "permissions": [
+                "ses:ListTagsForResource",
+                "ses:GetAddonSubscription"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "ses:TagResource",
+                "ses:UntagResource",
+                "ses:ListTagsForResource",
                 "ses:GetAddonSubscription"
             ]
         },
         "delete": {
             "permissions": [
+                "ses:GetAddonSubscription",
                 "ses:DeleteAddonSubscription"
             ]
         },
