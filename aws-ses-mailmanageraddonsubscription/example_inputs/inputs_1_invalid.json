@@ -1,12 +1,9 @@
 {
-    "TPSCode": "...",
-    "Title": "...",
-    "CoverSheetIncluded": "...",
-    "DueDate": "...",
-    "ApprovalDate": "...",
-    "Memo": "...",
-    "SecondCopyOfMemo": "...",
-    "TestCode": "...",
-    "Authors": "...",
-    "Tags": "..."
+    "AddonName": "UNKNOWN",
+    "Tags": [
+        {
+            "Key": "KeyOne",
+            "Value": "ValueOne"
+        }
+    ]
 }
