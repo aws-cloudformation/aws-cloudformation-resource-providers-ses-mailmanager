@@ -117,16 +117,18 @@ public class TagHelper {
     public static Map<String, String> getNewDesiredTags(final ResourceHandlerRequest<ResourceModel> handlerRequest) {
         final Map<String, String> desiredTags = new HashMap<>();
 
+        // System Tags
         if (handlerRequest.getSystemTags() != null) {
             desiredTags.putAll(handlerRequest.getSystemTags());
         }
 
-        // get desired stack level tags from handlerRequest
+        // Stack Tags
         if (handlerRequest.getDesiredResourceTags() != null) {
             desiredTags.putAll(handlerRequest.getDesiredResourceTags());
         }
 
-        if (handlerRequest.getPreviousResourceState() != null && handlerRequest.getDesiredResourceState().getTags() != null) {
+        // Resource Tags
+        if (handlerRequest.getDesiredResourceState() != null && handlerRequest.getDesiredResourceState().getTags() != null) {
             desiredTags.putAll(convertToMapFromResource(handlerRequest.getDesiredResourceState().getTags()));
         }
 

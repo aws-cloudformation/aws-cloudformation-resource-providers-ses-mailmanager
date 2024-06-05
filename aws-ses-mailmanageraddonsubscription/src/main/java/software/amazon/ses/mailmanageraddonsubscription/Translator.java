@@ -7,8 +7,10 @@ import software.amazon.awssdk.services.mailmanager.model.GetAddonSubscriptionRes
 import software.amazon.awssdk.services.mailmanager.model.ListAddonSubscriptionsRequest;
 import software.amazon.awssdk.services.mailmanager.model.ListAddonSubscriptionsResponse;
 import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequest;
+import software.amazon.awssdk.services.mailmanager.model.Tag;
 import software.amazon.awssdk.services.mailmanager.model.TagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UntagResourceRequest;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static software.amazon.ses.mailmanageraddonsubscription.TagHelper.convertToSet;
-import static software.amazon.ses.mailmanageraddonsubscription.utils.TagsConvertor.convertToSdk;
+import static software.amazon.ses.mailmanageraddonsubscription.TagHelper.getNewDesiredTags;
 
 /**
  * This class is a centralized placeholder for
@@ -36,10 +38,12 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static CreateAddonSubscriptionRequest translateToCreateRequest(final ResourceModel model) {
+  static CreateAddonSubscriptionRequest translateToCreateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request) {
+    Set<Tag> tagsTobeAdded = convertToSet(getNewDesiredTags(request));
+
     return CreateAddonSubscriptionRequest.builder()
             .addonName(model.getAddonName())
-            .tags(convertToSdk(model.getTags()))
+            .tags(tagsTobeAdded)
             .build();
   }
 
