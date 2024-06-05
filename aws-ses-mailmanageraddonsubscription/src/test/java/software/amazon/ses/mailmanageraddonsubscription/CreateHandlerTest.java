@@ -1,6 +1,10 @@
 package software.amazon.ses.mailmanageraddonsubscription;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+
+import org.mockito.ArgumentCaptor;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.ConflictException;
 import software.amazon.awssdk.services.mailmanager.model.CreateAddonSubscriptionRequest;
@@ -73,6 +77,48 @@ public class CreateHandlerTest extends AbstractTestBase {
         when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
 
         final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel().getAddonSubscriptionId()).isNotNull();
+        assertThat(response.getResourceModel().getAddonSubscriptionArn()).isNotNull();
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handle_request_simple_success_with_tags() {
+        final CreateHandler handler = new CreateHandler();
+
+        final ResourceModel model = ResourceModel.builder()
+                .addonName(AddonSubscription_NAME)
+                .tags(List.of(
+                        Tag.builder().key("KeyOne").value("ValueOne").build(),
+                        Tag.builder().key("KeyTwo").value("ValueTwo").build()
+                ))
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .systemTags(Map.of("SystemKeyOne", "SystemValueOne"))
+                .desiredResourceTags(Map.of("StackKeyOne", "StackValueOne"))
+                .build();
+
+        when(mailManagerClient.createAddonSubscription(any(CreateAddonSubscriptionRequest.class))).thenReturn(fakeCreateAddonSubscriptionResponse());
+        when(mailManagerClient.getAddonSubscription(any(GetAddonSubscriptionRequest.class))).thenReturn(fakeGetAddonSubscriptionResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        ArgumentCaptor<CreateAddonSubscriptionRequest> captor = ArgumentCaptor.forClass(CreateAddonSubscriptionRequest.class);
+
+        verify(mailManagerClient).createAddonSubscription(captor.capture());
+        assertThat(captor.getValue().addonName()).isEqualTo(AddonSubscription_NAME);
+        assertThat(captor.getValue().tags().size()).isEqualTo(4);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);

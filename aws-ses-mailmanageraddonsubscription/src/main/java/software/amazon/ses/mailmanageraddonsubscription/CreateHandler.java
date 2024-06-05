@@ -10,6 +10,8 @@ import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
+import static software.amazon.ses.mailmanageraddonsubscription.Translator.translateToCreateRequest;
+
 
 public class CreateHandler extends BaseHandlerStd {
     private Logger logger;
@@ -31,7 +33,7 @@ public class CreateHandler extends BaseHandlerStd {
         return ProgressEvent.progress(model, callbackContext)
                 .then(progress ->
                         proxy.initiate("AWS-SES-MailManagerAddonSubscription::Create", proxyClient, model, callbackContext)
-                                .translateToServiceRequest(Translator::translateToCreateRequest)
+                                .translateToServiceRequest(m -> translateToCreateRequest(model, request))
                                 .makeServiceCall((createAddonSubscriptionRequest, _proxyClient)
                                         -> createResource(createAddonSubscriptionRequest, _proxyClient, model, clientRequestToken))
                                 .handleError((createAddonSubscriptionRequest, exception, _proxyClient, _resourceModel, _callbackContext)
