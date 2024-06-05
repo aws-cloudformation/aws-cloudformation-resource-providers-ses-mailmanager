@@ -1,9 +1,12 @@
 package software.amazon.ses.mailmanageringresspoint;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestInfo;
+import org.mockito.ArgumentCaptor;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.ConflictException;
 import software.amazon.awssdk.services.mailmanager.model.CreateIngressPointRequest;
@@ -33,6 +36,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static software.amazon.ses.mailmanageringresspoint.HandlerHelper.INGRESS_POINT_NAME;
 import static software.amazon.ses.mailmanageringresspoint.HandlerHelper.LOGICAL_RESOURCE_ID;
 import static software.amazon.ses.mailmanageringresspoint.HandlerHelper.fakeListTagsForResourceResponse;
 
@@ -97,6 +101,48 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModel().getTrafficPolicyId()).isEqualTo(request.getDesiredResourceState().getTrafficPolicyId());
         assertThat(response.getResourceModel().getRuleSetId()).isEqualTo(request.getDesiredResourceState().getRuleSetId());
         assertThat(response.getResourceModel().getType()).isEqualTo(request.getDesiredResourceState().getType());
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handle_request_simple_success_with_tags() {
+        final CreateHandler handler = new CreateHandler();
+
+        final ResourceModel model = ResourceModel.builder()
+                .ingressPointName(INGRESS_POINT_NAME)
+                .tags(List.of(
+                        software.amazon.ses.mailmanageringresspoint.Tag.builder().key("KeyOne").value("ValueOne").build(),
+                        software.amazon.ses.mailmanageringresspoint.Tag.builder().key("KeyTwo").value("ValueTwo").build()
+                ))
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .systemTags(Map.of("SystemKeyOne", "SystemValueOne"))
+                .desiredResourceTags(Map.of("StackKeyOne", "StackValueOne"))
+                .build();
+
+        when(mailManagerClient.createIngressPoint(any(CreateIngressPointRequest.class))).thenReturn(HandlerHelper.fakeCreateIngressPointResponse());
+        when(mailManagerClient.getIngressPoint(any(GetIngressPointRequest.class))).thenReturn(HandlerHelper.fakeGetIngressPointResponse(HandlerHelper.INGRESS_POINT_OPEN_RELAY, IngressPointStatus.ACTIVE.toString()));
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        ArgumentCaptor<CreateIngressPointRequest> captor = ArgumentCaptor.forClass(CreateIngressPointRequest.class);
+
+        verify(mailManagerClient).createIngressPoint(captor.capture());
+        assertThat(captor.getValue().ingressPointName()).isEqualTo(INGRESS_POINT_NAME);
+        assertThat(captor.getValue().tags().size()).isEqualTo(4);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel().getIngressPointId()).isNotNull();
+        assertThat(response.getResourceModel().getIngressPointArn()).isNotNull();
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();

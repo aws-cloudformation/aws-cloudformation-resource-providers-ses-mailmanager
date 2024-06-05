@@ -12,6 +12,8 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.cloudformation.resource.IdentifierUtils;
 
+import static software.amazon.ses.mailmanagerarchive.Translator.translateToCreateRequest;
+
 
 public class CreateHandler extends BaseHandlerStd {
     private Logger logger;
@@ -40,7 +42,7 @@ public class CreateHandler extends BaseHandlerStd {
         return ProgressEvent.progress(model, callbackContext)
                 .then(progress ->
                         proxy.initiate("AWS-SES-MailManagerArchive::Create", proxyClient, model, callbackContext)
-                                .translateToServiceRequest(Translator::translateToCreateRequest)
+                                .translateToServiceRequest(m -> translateToCreateRequest(model, request))
                                 .makeServiceCall((createArchiveRequest, _proxyClient)
                                         -> createResource(createArchiveRequest, _proxyClient, model, clientRequestToken))
                                 .handleError((createArchiveRequest, exception, _proxyClient, _resourceModel, _callbackContext)

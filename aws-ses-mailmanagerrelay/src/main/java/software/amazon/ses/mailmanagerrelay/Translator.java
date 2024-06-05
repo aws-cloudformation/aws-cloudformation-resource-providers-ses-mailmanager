@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceRequ
 import software.amazon.awssdk.services.mailmanager.model.TagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UntagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UpdateRelayRequest;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,9 +21,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static software.amazon.ses.mailmanagerrelay.TagHelper.convertToSet;
+import static software.amazon.ses.mailmanagerrelay.TagHelper.getNewDesiredTags;
 import static software.amazon.ses.mailmanagerrelay.utils.RelayAuthConvertorFromSdk.ConvertFromSdk;
 import static software.amazon.ses.mailmanagerrelay.utils.RelayAuthConvertorToSdk.ConvertToSdk;
-import static software.amazon.ses.mailmanagerrelay.utils.TagsConvertor.convertToSdk;
 
 public class Translator {
 
@@ -32,13 +33,16 @@ public class Translator {
      * @param model resource model
      * @return awsRequest the aws service request to create a resource
      */
-    static CreateRelayRequest translateToCreateRequest(final ResourceModel model) {
+    static CreateRelayRequest translateToCreateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request) {
+
+        Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsTobeAdded = convertToSet(getNewDesiredTags(request));
+
         return CreateRelayRequest.builder()
                 .authentication(ConvertToSdk(model.getAuthentication()))
                 .relayName(model.getRelayName())
                 .serverName(model.getServerName())
                 .serverPort(model.getServerPort().intValue())
-                .tags(convertToSdk(model.getTags()))
+                .tags(tagsTobeAdded)
                 .build();
     }
 

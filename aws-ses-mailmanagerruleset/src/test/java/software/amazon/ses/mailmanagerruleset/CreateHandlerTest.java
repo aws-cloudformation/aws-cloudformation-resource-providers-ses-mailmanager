@@ -1,7 +1,10 @@
 package software.amazon.ses.mailmanagerruleset;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
+import org.mockito.ArgumentCaptor;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.ConflictException;
 import software.amazon.awssdk.services.mailmanager.model.CreateRuleSetRequest;
@@ -122,6 +125,49 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModel().getRules().get(0).getName()).isEqualTo(request.getDesiredResourceState().getRules().get(0).getName());
         assertThat(response.getResourceModel().getRules().get(0).getConditions()).isEqualTo(request.getDesiredResourceState().getRules().get(0).getConditions());
         assertThat(response.getResourceModel().getRules().get(0).getActions()).isEqualTo(request.getDesiredResourceState().getRules().get(0).getActions());
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handle_request_simple_success_with_tags() {
+        final CreateHandler handler = new CreateHandler();
+
+        final ResourceModel model = ResourceModel.builder()
+                .ruleSetName(RULE_SET_NAME)
+                .rules(generateRules())
+                .tags(List.of(
+                        Tag.builder().key("KeyOne").value("ValueOne").build(),
+                        Tag.builder().key("KeyTwo").value("ValueTwo").build()
+                ))
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .systemTags(Map.of("SystemKeyOne", "SystemValueOne"))
+                .desiredResourceTags(Map.of("StackKeyOne", "StackValueOne"))
+                .build();
+
+        when(mailManagerClient.createRuleSet(any(CreateRuleSetRequest.class))).thenReturn(fakeCreateRuleSetResponse());
+        when(mailManagerClient.getRuleSet(any(GetRuleSetRequest.class))).thenReturn(fakeGetRuleSetResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        ArgumentCaptor<CreateRuleSetRequest> captor = ArgumentCaptor.forClass(CreateRuleSetRequest.class);
+
+        verify(mailManagerClient).createRuleSet(captor.capture());
+        assertThat(captor.getValue().ruleSetName()).isEqualTo(RULE_SET_NAME);
+        assertThat(captor.getValue().tags().size()).isEqualTo(4);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel().getRuleSetId()).isNotNull();
+        assertThat(response.getResourceModel().getRuleSetArn()).isNotNull();
         assertThat(response.getResourceModel().getTags()).isNotNull();
         assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();

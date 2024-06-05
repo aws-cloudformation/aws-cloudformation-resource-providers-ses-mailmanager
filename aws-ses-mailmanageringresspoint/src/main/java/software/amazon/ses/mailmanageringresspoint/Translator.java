@@ -14,6 +14,7 @@ import software.amazon.awssdk.services.mailmanager.model.TagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UntagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UpdateIngressPointRequest;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static software.amazon.ses.mailmanageringresspoint.TagHelper.convertToSet;
+import static software.amazon.ses.mailmanageringresspoint.TagHelper.getNewDesiredTags;
 import static software.amazon.ses.mailmanageringresspoint.utils.TagsConvertor.convertToSdk;
 
 public class Translator {
@@ -35,8 +37,10 @@ public class Translator {
    * @param model resource model
    * @return CreateIngressPointRequest the aws service request to create a resource
    */
-  static CreateIngressPointRequest translateToCreateRequest(final ResourceModel model) {
+  static CreateIngressPointRequest translateToCreateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request) {
     modelValidator(model);
+
+    Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsTobeAdded = convertToSet(getNewDesiredTags(request));
 
     return CreateIngressPointRequest.builder()
             .ingressPointName(model.getIngressPointName())
@@ -50,7 +54,7 @@ public class Translator {
             )
             .ruleSetId(model.getRuleSetId())
             .trafficPolicyId(model.getTrafficPolicyId())
-            .tags(convertToSdk(model.getTags()))
+            .tags(tagsTobeAdded)
             .build();
   }
 

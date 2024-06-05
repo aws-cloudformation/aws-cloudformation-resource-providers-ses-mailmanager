@@ -1,7 +1,10 @@
 package software.amazon.ses.mailmanagerarchive;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
+import org.mockito.ArgumentCaptor;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.ConflictException;
 import software.amazon.awssdk.services.mailmanager.model.CreateArchiveRequest;
@@ -131,6 +134,48 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModel().getArchiveState()).isNotNull();
         assertThat(response.getResourceModel().getArchiveArn()).isNotNull();
         assertThat(response.getResourceModel().getRetention()).isEqualTo(request.getDesiredResourceState().getRetention());
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handle_request_simple_success_with_tags() {
+        final CreateHandler handler = new CreateHandler();
+
+        final ResourceModel model = ResourceModel.builder()
+                .archiveName(ARCHIVE_NAME)
+                .tags(List.of(
+                        Tag.builder().key("KeyOne").value("ValueOne").build(),
+                        Tag.builder().key("KeyTwo").value("ValueTwo").build()
+                ))
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .systemTags(Map.of("SystemKeyOne", "SystemValueOne"))
+                .desiredResourceTags(Map.of("StackKeyOne", "StackValueOne"))
+                .build();
+
+        when(mailManagerClient.createArchive(any(CreateArchiveRequest.class))).thenReturn(fakeCreateArchiveResponse());
+        when(mailManagerClient.getArchive(any(GetArchiveRequest.class))).thenReturn(fakeGetArchiveResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        ArgumentCaptor<CreateArchiveRequest> captor = ArgumentCaptor.forClass(CreateArchiveRequest.class);
+
+        verify(mailManagerClient).createArchive(captor.capture());
+        assertThat(captor.getValue().archiveName()).isEqualTo(ARCHIVE_NAME);
+        assertThat(captor.getValue().tags().size()).isEqualTo(4);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel().getArchiveId()).isNotNull();
+        assertThat(response.getResourceModel().getArchiveArn()).isNotNull();
         assertThat(response.getResourceModel().getTags()).isNotNull();
         assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();

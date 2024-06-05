@@ -14,6 +14,8 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.cloudformation.resource.IdentifierUtils;
 
+import static software.amazon.ses.mailmanageringresspoint.Translator.translateToCreateRequest;
+
 public class CreateHandler extends BaseHandlerStd {
     private Logger logger;
 
@@ -47,19 +49,15 @@ public class CreateHandler extends BaseHandlerStd {
         return ProgressEvent.progress(model, callbackContext)
                 .then(progress ->
                         proxy.initiate("AWS-SES-MailManagerIngressPoint::Create", proxyClient, model, callbackContext)
-                                .translateToServiceRequest(Translator::translateToCreateRequest)
+                                .translateToServiceRequest(m -> translateToCreateRequest(model, request))
                                 .backoffDelay(STABILIZATION_DELAY_CREATE)
-                                .makeServiceCall(
-                                        (createIngressPointRequest, _proxyClient)
-                                                -> createResource(createIngressPointRequest, _proxyClient, clientRequestToken)
+                                .makeServiceCall((createIngressPointRequest, _proxyClient)
+                                        -> createResource(createIngressPointRequest, _proxyClient, clientRequestToken))
+                                .stabilize((createIngressPointRequest, createIngressPointResponse, _proxyClient, _resourceModel, _context)
+                                        -> stabilizedOnCreate(createIngressPointResponse, _proxyClient, _resourceModel, clientRequestToken)
                                 )
-                                .stabilize(
-                                        (createIngressPointRequest, createIngressPointResponse, _proxyClient, _resourceModel, _context)
-                                                -> stabilizedOnCreate(createIngressPointResponse, _proxyClient, _resourceModel, clientRequestToken)
-                                )
-                                .handleError(
-                                        (createIngressPointRequest, exception, _proxyClient, _resourceModel, _callbackContext)
-                                                -> handleError(exception, _resourceModel, _callbackContext, logger, clientRequestToken)
+                                .handleError((createIngressPointRequest, exception, _proxyClient, _resourceModel, _callbackContext)
+                                        -> handleError(exception, _resourceModel, _callbackContext, logger, clientRequestToken)
                                 )
                                 .progress()
                 )
