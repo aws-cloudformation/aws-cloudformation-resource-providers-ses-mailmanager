@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.mailmanager.model.ListTrafficPoliciesResp
 import software.amazon.awssdk.services.mailmanager.model.TagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UntagResourceRequest;
 import software.amazon.awssdk.services.mailmanager.model.UpdateTrafficPolicyRequest;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.ses.mailmanagertrafficpolicy.utils.PolicyStatementConvertorFromSdk;
 import software.amazon.ses.mailmanagertrafficpolicy.utils.PolicyStatementConvertorToSdk;
 
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static software.amazon.ses.mailmanagertrafficpolicy.TagHelper.convertToSet;
-import static software.amazon.ses.mailmanagertrafficpolicy.utils.TagsConvertor.convertToSdk;
+import static software.amazon.ses.mailmanagertrafficpolicy.TagHelper.getNewDesiredTags;
 
 
 public class Translator {
@@ -33,13 +34,15 @@ public class Translator {
    * @param model resource model
    * @return awsRequest the aws service request to create a resource
    */
-  static CreateTrafficPolicyRequest translateToCreateRequest(final ResourceModel model) {
+  static CreateTrafficPolicyRequest translateToCreateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request) {
+    Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsTobeAdded = convertToSet(getNewDesiredTags(request));
+
     return CreateTrafficPolicyRequest.builder()
             .trafficPolicyName(model.getTrafficPolicyName())
             .policyStatements(PolicyStatementConvertorToSdk.ConvertToSdk(model.getPolicyStatements()))
             .maxMessageSizeBytes(model.getMaxMessageSizeBytes() == null ? null : model.getMaxMessageSizeBytes().intValue())
             .defaultAction(model.getDefaultAction())
-            .tags(convertToSdk(model.getTags()))
+            .tags(tagsTobeAdded)
             .build();
   }
 

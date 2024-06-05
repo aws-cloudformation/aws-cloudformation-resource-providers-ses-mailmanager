@@ -1,7 +1,10 @@
 package software.amazon.ses.mailmanagerrelay;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
+import org.mockito.ArgumentCaptor;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.ConflictException;
 import software.amazon.awssdk.services.mailmanager.model.CreateRelayRequest;
@@ -136,6 +139,53 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModel().getServerPort()).isEqualTo(request.getDesiredResourceState().getServerPort());
         assertThat(response.getResourceModel().getAuthentication()).isNotNull();
         assertThat(response.getResourceModel().getAuthentication().getSecretArn()).isEqualTo(RELAY_SECRET_ARN);
+        assertThat(response.getResourceModel().getTags()).isNotNull();
+        assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+    }
+
+    @Test
+    public void handle_request_simple_success_with_tags() {
+        final CreateHandler handler = new CreateHandler();
+
+        final ResourceModel model = ResourceModel.builder()
+                .relayName(RELAY_NAME)
+                .serverName(RELAY_SERVICE_NAME)
+                .serverPort(RELAY_SERVICE_PORT.doubleValue())
+                .authentication(RelayAuthentication.builder()
+                        .secretArn(RELAY_SECRET_ARN)
+                        .build())
+                .tags(List.of(
+                        Tag.builder().key("KeyOne").value("ValueOne").build(),
+                        Tag.builder().key("KeyTwo").value("ValueTwo").build()
+                ))
+                .build();
+
+        final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .systemTags(Map.of("SystemKeyOne", "SystemValueOne"))
+                .desiredResourceTags(Map.of("StackKeyOne", "StackValueOne"))
+                .build();
+
+        when(mailManagerClient.createRelay(any(CreateRelayRequest.class))).thenReturn(fakeCreateRelayResponse());
+        when(mailManagerClient.getRelay(any(GetRelayRequest.class))).thenReturn(fakeGetRelayResponse());
+        when(mailManagerClient.listTagsForResource(any(ListTagsForResourceRequest.class))).thenReturn(fakeListTagsForResourceResponse());
+
+        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+
+        ArgumentCaptor<CreateRelayRequest> captor = ArgumentCaptor.forClass(CreateRelayRequest.class);
+
+        verify(mailManagerClient).createRelay(captor.capture());
+        assertThat(captor.getValue().relayName()).isEqualTo(RELAY_NAME);
+        assertThat(captor.getValue().tags().size()).isEqualTo(4);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(response.getResourceModel().getRelayId()).isNotNull();
+        assertThat(response.getResourceModel().getRelayArn()).isNotNull();
         assertThat(response.getResourceModel().getTags()).isNotNull();
         assertThat(response.getResourceModel().getTags().size()).isEqualTo(2);
         assertThat(response.getResourceModels()).isNull();
