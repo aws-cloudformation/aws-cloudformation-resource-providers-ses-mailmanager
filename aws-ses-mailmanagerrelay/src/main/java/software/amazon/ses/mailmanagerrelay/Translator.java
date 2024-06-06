@@ -35,14 +35,14 @@ public class Translator {
      */
     static CreateRelayRequest translateToCreateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request) {
 
-        Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsTobeAdded = convertToSet(getNewDesiredTags(request));
+        Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsToBeAdded = convertToSet(getNewDesiredTags(request));
 
         return CreateRelayRequest.builder()
                 .authentication(ConvertToSdk(model.getAuthentication()))
                 .relayName(model.getRelayName())
                 .serverName(model.getServerName())
                 .serverPort(model.getServerPort().intValue())
-                .tags(tagsTobeAdded)
+                .tags(tagsToBeAdded)
                 .build();
     }
 

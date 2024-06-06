@@ -39,11 +39,11 @@ public class Translator {
    * @return awsRequest the aws service request to create a resource
    */
   static CreateAddonSubscriptionRequest translateToCreateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request) {
-    Set<Tag> tagsTobeAdded = convertToSet(getNewDesiredTags(request));
+    Set<Tag> tagsToBeAdded = convertToSet(getNewDesiredTags(request));
 
     return CreateAddonSubscriptionRequest.builder()
             .addonName(model.getAddonName())
-            .tags(tagsTobeAdded)
+            .tags(tagsToBeAdded)
             .build();
   }
 

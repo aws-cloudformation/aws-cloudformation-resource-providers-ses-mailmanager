@@ -41,12 +41,12 @@ public class Translator {
    * @return awsRequest the aws service request to create a resource
    */
   static CreateRuleSetRequest translateToCreateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request) {
-    Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsTobeAdded = convertToSet(getNewDesiredTags(request));
+    Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsToBeAdded = convertToSet(getNewDesiredTags(request));
 
     return CreateRuleSetRequest.builder()
             .ruleSetName(model.getRuleSetName())
             .rules(RuleConvertorToSdk.ConvertToSdk(model.getRules()))
-            .tags(tagsTobeAdded)
+            .tags(tagsToBeAdded)
             .build();
   }
 

@@ -34,6 +34,9 @@ Resources:
                 - "ses:DeleteAddonInstance"
                 - "ses:GetAddonInstance"
                 - "ses:ListAddonInstances"
+                - "ses:ListTagsForResource"
+                - "ses:TagResource"
+                - "ses:UntagResource"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

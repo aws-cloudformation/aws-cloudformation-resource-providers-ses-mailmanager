@@ -62,12 +62,8 @@
         "/properties/AddonInstanceId",
         "/properties/AddonName"
     ],
-    "writeOnlyProperties": [
-        "/properties/Tags"
-    ],
     "createOnlyProperties": [
-        "/properties/AddonSubscriptionId",
-        "/properties/Tags"
+        "/properties/AddonSubscriptionId"
     ],
     "primaryIdentifier": [
         "/properties/AddonInstanceId"
@@ -75,16 +71,29 @@
     "handlers": {
         "create": {
             "permissions": [
+                "ses:TagResource",
+                "ses:ListTagsForResource",
+                "ses:GetAddonInstance",
                 "ses:CreateAddonInstance"
             ]
         },
         "read": {
             "permissions": [
+                "ses:ListTagsForResource",
+                "ses:GetAddonInstance"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "ses:TagResource",
+                "ses:UntagResource",
+                "ses:ListTagsForResource",
                 "ses:GetAddonInstance"
             ]
         },
         "delete": {
             "permissions": [
+                "ses:GetAddonInstance",
                 "ses:DeleteAddonInstance"
             ]
         },

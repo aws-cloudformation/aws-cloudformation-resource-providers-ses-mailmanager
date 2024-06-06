@@ -40,7 +40,7 @@ public class Translator {
   static CreateIngressPointRequest translateToCreateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request) {
     modelValidator(model);
 
-    Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsTobeAdded = convertToSet(getNewDesiredTags(request));
+    Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsToBeAdded = convertToSet(getNewDesiredTags(request));
 
     return CreateIngressPointRequest.builder()
             .ingressPointName(model.getIngressPointName())
@@ -54,7 +54,7 @@ public class Translator {
             )
             .ruleSetId(model.getRuleSetId())
             .trafficPolicyId(model.getTrafficPolicyId())
-            .tags(tagsTobeAdded)
+            .tags(tagsToBeAdded)
             .build();
   }
 
