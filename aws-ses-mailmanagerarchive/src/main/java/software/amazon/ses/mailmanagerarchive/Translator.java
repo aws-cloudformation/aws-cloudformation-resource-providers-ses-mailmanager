@@ -36,13 +36,13 @@ public class Translator {
      * @return awsRequest the aws service request to create a resource
      */
     static CreateArchiveRequest translateToCreateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request) {
-        Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsTobeAdded = convertToSet(getNewDesiredTags(request));
+        Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsToBeAdded = convertToSet(getNewDesiredTags(request));
 
         return CreateArchiveRequest.builder()
                 .archiveName(model.getArchiveName())
                 .retention(ArchiveConvertorToSdk.convertToSdk(model.getRetention()))
                 .kmsKeyArn(model.getKmsKeyArn())
-                .tags(tagsTobeAdded)
+                .tags(tagsToBeAdded)
                 .build();
     }
 

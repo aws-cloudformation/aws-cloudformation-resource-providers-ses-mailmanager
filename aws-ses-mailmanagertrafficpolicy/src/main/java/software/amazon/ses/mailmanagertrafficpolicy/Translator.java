@@ -35,14 +35,14 @@ public class Translator {
    * @return awsRequest the aws service request to create a resource
    */
   static CreateTrafficPolicyRequest translateToCreateRequest(final ResourceModel model, final ResourceHandlerRequest<ResourceModel> request) {
-    Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsTobeAdded = convertToSet(getNewDesiredTags(request));
+    Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsToBeAdded = convertToSet(getNewDesiredTags(request));
 
     return CreateTrafficPolicyRequest.builder()
             .trafficPolicyName(model.getTrafficPolicyName())
             .policyStatements(PolicyStatementConvertorToSdk.ConvertToSdk(model.getPolicyStatements()))
             .maxMessageSizeBytes(model.getMaxMessageSizeBytes() == null ? null : model.getMaxMessageSizeBytes().intValue())
             .defaultAction(model.getDefaultAction())
-            .tags(tagsTobeAdded)
+            .tags(tagsToBeAdded)
             .build();
   }
 

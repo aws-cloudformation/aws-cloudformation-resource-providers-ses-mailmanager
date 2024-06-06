@@ -1,12 +1,9 @@
 {
-    "TPSCode": "...",
-    "Title": "...",
-    "CoverSheetIncluded": "...",
-    "DueDate": "...",
-    "ApprovalDate": "...",
-    "Memo": "...",
-    "SecondCopyOfMemo": "...",
-    "TestCode": "...",
-    "Authors": "...",
-    "Tags": "..."
+    "AddonSubscriptionId": "as-12345",
+    "Tags": [
+        {
+            "Key": "KeyTwo",
+            "Value": "ValueTwo"
+        }
+    ]
 }
