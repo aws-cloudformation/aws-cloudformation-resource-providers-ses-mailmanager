@@ -54,6 +54,17 @@
             "minItems": 0
         }
     },
+    "tagging": {
+        "taggable": true,
+        "tagOnCreate": true,
+        "tagUpdatable": true,
+        "cloudFormationSystemTags": true,
+        "tagProperty": "/properties/Tags",
+        "permissions": [
+            "ses:TagResource",
+            "ses:UntagResource"
+        ]
+    },
     "required": [
         "AddonSubscriptionId"
     ],
