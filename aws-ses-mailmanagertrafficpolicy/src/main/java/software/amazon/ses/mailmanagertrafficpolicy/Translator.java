@@ -1,5 +1,6 @@
 package software.amazon.ses.mailmanagertrafficpolicy;
 
+import org.apache.commons.lang3.ObjectUtils;
 import software.amazon.awssdk.services.mailmanager.model.CreateTrafficPolicyRequest;
 import software.amazon.awssdk.services.mailmanager.model.DeleteTrafficPolicyRequest;
 import software.amazon.awssdk.services.mailmanager.model.GetTrafficPolicyRequest;
@@ -70,7 +71,7 @@ public class Translator {
             .trafficPolicyName(response.trafficPolicyName())
             .trafficPolicyArn(response.trafficPolicyArn())
             .policyStatements(PolicyStatementConvertorFromSdk.ConvertFromSdk(response.policyStatements()))
-            .maxMessageSizeBytes(response.maxMessageSizeBytes() == null ? 0 : Double.valueOf(response.maxMessageSizeBytes()))
+            .maxMessageSizeBytes(Double.valueOf(ObjectUtils.defaultIfNull(response.maxMessageSizeBytes(), 0)))
             .defaultAction(response.defaultActionAsString())
             .build();
   }
