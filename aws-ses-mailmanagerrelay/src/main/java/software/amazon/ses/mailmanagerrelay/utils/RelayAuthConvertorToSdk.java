@@ -4,7 +4,7 @@ import software.amazon.awssdk.services.mailmanager.model.NoAuthentication;
 import software.amazon.awssdk.services.mailmanager.model.RelayAuthentication;
 
 public class RelayAuthConvertorToSdk {
-    public static RelayAuthentication ConvertToSdk(software.amazon.ses.mailmanagerrelay.RelayAuthentication auth) {
+    public static RelayAuthentication convertToSdk(software.amazon.ses.mailmanagerrelay.RelayAuthentication auth) {
         if (auth == null) {
             return null;
         }

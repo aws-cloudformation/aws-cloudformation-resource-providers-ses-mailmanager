@@ -1,12 +1,11 @@
 package software.amazon.ses.mailmanagerrelay.utils;
 
-import software.amazon.awssdk.services.mailmanager.model.NoAuthentication;
 import software.amazon.awssdk.services.mailmanager.model.RelayAuthentication;
 
 import java.util.HashMap;
 
 public class RelayAuthConvertorFromSdk {
-    public static software.amazon.ses.mailmanagerrelay.RelayAuthentication ConvertFromSdk(RelayAuthentication auth) {
+    public static software.amazon.ses.mailmanagerrelay.RelayAuthentication convertFromSdk(RelayAuthentication auth) {
         if (auth == null) {
             return null;
         }

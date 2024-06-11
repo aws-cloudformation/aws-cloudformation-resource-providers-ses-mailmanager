@@ -4,7 +4,6 @@ import software.amazon.awssdk.services.mailmanager.MailManagerClient;
 import software.amazon.awssdk.services.mailmanager.model.DeleteIngressPointRequest;
 import software.amazon.awssdk.services.mailmanager.model.DeleteIngressPointResponse;
 import software.amazon.awssdk.services.mailmanager.model.GetIngressPointRequest;
-import software.amazon.awssdk.services.mailmanager.model.GetIngressPointResponse;
 import software.amazon.awssdk.services.mailmanager.model.IngressPointStatus;
 import software.amazon.awssdk.services.mailmanager.model.ResourceNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnNotStabilizedException;
@@ -58,7 +57,7 @@ public class DeleteHandler extends BaseHandlerStd {
                 .build();
 
         // Need to check if resource exists before deleting due to idempotent deletion.
-        GetIngressPointResponse response = proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::getIngressPoint);
+        proxyClient.injectCredentialsAndInvokeV2(request, proxyClient.client()::getIngressPoint);
 
         logger.log(String.format("[ClientRequestToken: %s] IngressPoint ID %s is deleting.", clientRequestToken, deleteIngressPointRequest.ingressPointId()));
         return proxyClient.injectCredentialsAndInvokeV2(deleteIngressPointRequest, proxyClient.client()::deleteIngressPoint);

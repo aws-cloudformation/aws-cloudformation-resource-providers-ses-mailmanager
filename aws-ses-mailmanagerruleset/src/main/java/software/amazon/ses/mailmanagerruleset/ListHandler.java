@@ -9,8 +9,6 @@ import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 public class ListHandler extends BaseHandlerStd {
-    private Logger logger;
-
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final AmazonWebServicesClientProxy proxy,
@@ -18,8 +16,6 @@ public class ListHandler extends BaseHandlerStd {
             final CallbackContext callbackContext,
             final ProxyClient<MailManagerClient> proxyClient,
             final Logger logger) {
-
-        this.logger = logger;
 
         final ResourceModel model = request.getDesiredResourceState();
         final String clientRequestToken = request.getClientRequestToken();

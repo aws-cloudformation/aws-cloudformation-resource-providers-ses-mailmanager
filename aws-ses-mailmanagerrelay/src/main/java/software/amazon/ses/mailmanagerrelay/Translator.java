@@ -22,8 +22,8 @@ import java.util.stream.Stream;
 
 import static software.amazon.ses.mailmanagerrelay.TagHelper.convertToSet;
 import static software.amazon.ses.mailmanagerrelay.TagHelper.getNewDesiredTags;
-import static software.amazon.ses.mailmanagerrelay.utils.RelayAuthConvertorFromSdk.ConvertFromSdk;
-import static software.amazon.ses.mailmanagerrelay.utils.RelayAuthConvertorToSdk.ConvertToSdk;
+import static software.amazon.ses.mailmanagerrelay.utils.RelayAuthConvertorFromSdk.convertFromSdk;
+import static software.amazon.ses.mailmanagerrelay.utils.RelayAuthConvertorToSdk.convertToSdk;
 
 public class Translator {
 
@@ -38,7 +38,7 @@ public class Translator {
         Set<software.amazon.awssdk.services.mailmanager.model.Tag> tagsToBeAdded = convertToSet(getNewDesiredTags(request));
 
         return CreateRelayRequest.builder()
-                .authentication(ConvertToSdk(model.getAuthentication()))
+                .authentication(convertToSdk(model.getAuthentication()))
                 .relayName(model.getRelayName())
                 .serverName(model.getServerName())
                 .serverPort(model.getServerPort().intValue())
@@ -71,7 +71,7 @@ public class Translator {
                 .relayArn(response.relayArn())
                 .serverName(response.serverName())
                 .serverPort(response.serverPort().doubleValue())
-                .authentication(ConvertFromSdk(response.authentication()))
+                .authentication(convertFromSdk(response.authentication()))
                 .build();
     }
 
@@ -97,7 +97,7 @@ public class Translator {
         return UpdateRelayRequest.builder()
                 .relayId(model.getRelayId())
                 .relayName(model.getRelayName())
-                .authentication(ConvertToSdk(model.getAuthentication()))
+                .authentication(convertToSdk(model.getAuthentication()))
                 .serverName(model.getServerName())
                 .serverPort(model.getServerPort().intValue())
                 .build();
