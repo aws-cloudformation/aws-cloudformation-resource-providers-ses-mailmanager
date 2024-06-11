@@ -15,8 +15,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class UpdateHandler extends BaseHandlerStd {
-    private Logger logger;
-
     protected ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final AmazonWebServicesClientProxy proxy,
             final ResourceHandlerRequest<ResourceModel> request,
@@ -24,8 +22,6 @@ public class UpdateHandler extends BaseHandlerStd {
             final ProxyClient<MailManagerClient> proxyClient,
             final Logger logger
     ) {
-        this.logger = logger;
-
         final ResourceModel model = request.getDesiredResourceState();
         final ResourceModel previousModel = request.getPreviousResourceState();
         final String clientRequestToken = request.getClientRequestToken();

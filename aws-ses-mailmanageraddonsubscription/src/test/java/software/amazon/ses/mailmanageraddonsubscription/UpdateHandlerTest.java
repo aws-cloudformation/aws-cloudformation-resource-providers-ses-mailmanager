@@ -211,10 +211,6 @@ public class UpdateHandlerTest extends AbstractTestBase {
     public void handle_request_failure_due_to_resource_not_found() {
         final UpdateHandler handler = new UpdateHandler();
 
-        final ResourceModel model = ResourceModel.builder()
-                .addonSubscriptionId(AddonSubscription_ID)
-                .build();
-
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(desired_AddonSubscription_model)
                 .previousResourceState(previous_AddonSubscription_model)
