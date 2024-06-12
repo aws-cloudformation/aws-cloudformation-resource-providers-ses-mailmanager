@@ -1,5 +1,6 @@
 package software.amazon.ses.mailmanagerarchive;
 
+import org.apache.commons.lang3.ObjectUtils;
 import software.amazon.awssdk.services.mailmanager.model.ArchiveState;
 import software.amazon.awssdk.services.mailmanager.model.CreateArchiveRequest;
 import software.amazon.awssdk.services.mailmanager.model.DeleteArchiveRequest;
@@ -71,7 +72,7 @@ public class Translator {
                 .archiveState(response.archiveStateAsString())
                 .archiveArn(response.archiveArn())
                 .retention(ArchiveConvertorFromSdk.convertFromSdk(response.retention()))
-                .kmsKeyArn(response.kmsKeyArn())
+                .kmsKeyArn(ObjectUtils.defaultIfNull(response.kmsKeyArn(), ""))
                 .build();
     }
 
