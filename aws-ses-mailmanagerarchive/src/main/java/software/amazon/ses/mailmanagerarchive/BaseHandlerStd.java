@@ -2,6 +2,7 @@ package software.amazon.ses.mailmanagerarchive;
 
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.mailmanager.MailManagerClient;
+import software.amazon.awssdk.services.mailmanager.model.AccessDeniedException;
 import software.amazon.awssdk.services.mailmanager.model.ConflictException;
 import software.amazon.awssdk.services.mailmanager.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.mailmanager.model.ServiceQuotaExceededException;
@@ -24,7 +25,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             ConflictException.class, HandlerErrorCode.ResourceConflict,
             ResourceNotFoundException.class, HandlerErrorCode.NotFound,
             ServiceQuotaExceededException.class, HandlerErrorCode.ServiceLimitExceeded,
-            AwsServiceException.class, HandlerErrorCode.GeneralServiceException
+            AwsServiceException.class, HandlerErrorCode.GeneralServiceException,
+            AccessDeniedException.class, HandlerErrorCode.AccessDenied
     );
 
     @Override
