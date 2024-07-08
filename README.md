@@ -35,11 +35,6 @@ pre-commit run --all-files
 mvn verify
 ```
 
-License
--------
-
-This library is licensed under the Apache 2.0 License.
-
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
