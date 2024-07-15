@@ -123,6 +123,7 @@ public class Translator {
   static UpdateIngressPointRequest translateToUpdateRequest(final ResourceModel model) {
     modelValidator(model);
     UpdateIngressPointRequest.Builder builder = UpdateIngressPointRequest.builder()
+            .ingressPointName(model.getIngressPointName())
             .ingressPointId(model.getIngressPointId())
             .ruleSetId(model.getRuleSetId())
             .statusToUpdate(model.getStatusToUpdate())
