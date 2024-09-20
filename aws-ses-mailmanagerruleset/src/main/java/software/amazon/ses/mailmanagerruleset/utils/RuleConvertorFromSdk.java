@@ -280,6 +280,7 @@ public class RuleConvertorFromSdk {
 
         return RuleStringToEvaluate.builder()
                 .attribute(source.attributeAsString())
+                .mimeHeaderAttribute(source.mimeHeaderAttribute())
                 .build();
     }
 

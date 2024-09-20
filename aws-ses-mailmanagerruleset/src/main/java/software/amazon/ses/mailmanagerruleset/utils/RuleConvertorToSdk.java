@@ -280,6 +280,7 @@ public class RuleConvertorToSdk {
 
         return software.amazon.awssdk.services.mailmanager.model.RuleStringToEvaluate.builder()
                 .attribute(source.getAttribute())
+                .mimeHeaderAttribute(source.getMimeHeaderAttribute())
                 .build();
     }
 
