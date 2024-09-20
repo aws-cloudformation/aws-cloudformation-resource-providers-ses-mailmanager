@@ -6,6 +6,7 @@ import software.amazon.awssdk.services.mailmanager.model.ListRuleSetsResponse;
 import software.amazon.awssdk.services.mailmanager.model.ListTagsForResourceResponse;
 import software.amazon.awssdk.services.mailmanager.model.RuleBooleanEmailAttribute;
 import software.amazon.awssdk.services.mailmanager.model.RuleBooleanOperator;
+import software.amazon.awssdk.services.mailmanager.model.RuleStringOperator;
 import software.amazon.awssdk.services.mailmanager.model.RuleSet;
 import software.amazon.awssdk.services.mailmanager.model.RuleVerdict;
 import software.amazon.awssdk.services.mailmanager.model.RuleVerdictAttribute;
@@ -81,6 +82,17 @@ public class HandlerHelper {
                                                         .evaluate(RuleBooleanToEvaluate.builder()
                                                                 .attribute(RuleBooleanEmailAttribute.TLS.toString())
                                                                 .build())
+                                                        .build()
+                                        )
+                                        .build(),
+                                RuleCondition.builder()
+                                        .stringExpression(
+                                                RuleStringExpression.builder()
+                                                        .operator(RuleStringOperator.EQUALS.toString())
+                                                        .evaluate(RuleStringToEvaluate.builder()
+                                                                .mimeHeaderAttribute("X-Header-Example")
+                                                                .build())
+                                                        .values(List.of("ValueToCompare"))
                                                         .build()
                                         )
                                         .build()
